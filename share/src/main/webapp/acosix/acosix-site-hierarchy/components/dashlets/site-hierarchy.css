@@ -1,0 +1,44 @@
+.dashlet.site-hierarchy-navigation {
+	margin: 20px 0;
+	padding: 0;
+	position: relative;
+}
+
+.dashlet.site-hierarchy .ygtvcontent .site {
+	background: url("../../../../components/images/site-16.png") no-repeat scroll 3px 0px transparent;
+	padding-left: 22px;
+}
+
+.dashlet.site-hierarchy .ygtvtp,
+.dashlet.site-hierarchy .ygtvtph,
+.dashlet.site-hierarchy .ygtvtphh,
+.dashlet.site-hierarchy .ygtvtm,
+.dashlet.site-hierarchy .ygtvtmh,
+.dashlet.site-hierarchy .ygtvtmhh,
+.dashlet.site-hierarchy .ygtvtn,
+.dashlet.site-hierarchy .ygtvtnh,
+.dashlet.site-hierarchy .ygtvtnhh,
+.dashlet.site-hierarchy .ygtvlp,
+.dashlet.site-hierarchy .ygtvlph,
+.dashlet.site-hierarchy .ygtvlphh,
+.dashlet.site-hierarchy .ygtvlm,
+.dashlet.site-hierarchy .ygtvlmh,
+.dashlet.site-hierarchy .ygtvlmhh,
+.dashlet.site-hierarchy .ygtvln,
+.dashlet.site-hierarchy .ygtvlnh,
+.dashlet.site-hierarchy .ygtvlnhh {
+	/* use default +/- style of YUI, not the folder tree style of Alfresco */
+	background-image: url("../../../../yui/assets/skins/sam/treeview-sprite.gif");
+}
+
+.dashlet.site-hierarchy .ygtvlabel {
+	background: none;
+}
+
+.dashlet.site-hierarchy .tree {
+	padding-left: 5px;
+}
+
+.dashlet.site-hierarchy .scrollableList {
+	height: 100%;
+}
