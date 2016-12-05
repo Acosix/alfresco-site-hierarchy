@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+           http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+    <bean id="${moduleId}.siteHierarchyService" class="${project.artifactId}.service.SiteHierarchyServiceImpl" depends-on="${moduleId}.dictionaryBootstrap">
+        <property name="storesToIgnorePolicies" ref="storesToIgnorePolicies" />
+        <property name="namespaceService" ref="NamespaceService" />
+        <property name="dictionaryService" ref="DictionaryService" />
+        <property name="nodeService" ref="NodeService" />
+        <property name="siteService" ref="SiteService" />
+        <!-- TenantService does not exist -->
+        <property name="tenantService" ref="tenantService" />
+        <property name="searchService" ref="SearchService" />
+        <property name="policyComponent" ref="policyComponent" />
+    </bean>
+
+    <bean id="${moduleId}.SiteHierarchyService" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="proxyInterfaces">
+            <list>
+                <value>${project.artifactId}.service.SiteHierarchyService</value>
+            </list>
+        </property>
+        <property name="target" ref="${moduleId}.siteHierarchyService" />
+        <property name="interceptorNames">
+            <list>
+                <idref local="${moduleId}.SiteHierarchyService_transaction" />
+                <idref bean="AuditMethodInterceptor" />
+                <idref bean="exceptionTranslator" />
+                <idref local="${moduleId}.SiteHierarchyService_security" />
+            </list>
+        </property>
+    </bean>
+
+    <bean id="${moduleId}.SiteHierarchyService_transaction" class="org.alfresco.repo.transaction.RetryingTransactionInterceptor">
+        <property name="transactionService" ref="TransactionService" />
+        <property name="transactionManager" ref="transactionManager" />
+        <property name="transactionAttributes">
+            <props>
+                <prop key="get*">${server.transaction.mode.readOnly}</prop>
+                <prop key="list*">${server.transaction.mode.readOnly}</prop>
+                <prop key="*">${server.transaction.mode.default}</prop>
+            </props>
+        </property>
+    </bean>
+
+    <!-- TODO Once acosix-utility adds a voter for sites we should enhance this with proper role checks -->
+    <bean id="${moduleId}.SiteHierarchyService_security" class="org.alfresco.repo.security.permissions.impl.acegi.MethodSecurityInterceptor">
+        <property name="authenticationManager" ref="authenticationManager" />
+        <property name="accessDecisionManager" ref="accessDecisionManager" />
+        <property name="afterInvocationManager" ref="afterInvocationManager" />
+        <property name="objectDefinitionSource">
+            <value>
+                ${project.artifactId}.service.SiteHierarchyService.getParentSite=ACL_ALLOW
+                ${project.artifactId}.service.SiteHierarchyService.listTopLevelSites=ACL_ALLOW
+                ${project.artifactId}.service.SiteHierarchyService.listChildSites=ACL_ALLOW
+                ${project.artifactId}.service.SiteHierarchyService.addChildSite=ACL_ALLOW
+                ${project.artifactId}.service.SiteHierarchyService.removeChildSite=ACL_ALLOW
+                ${project.artifactId}.service.SiteHierarchyService.*=ACL_DENY
+            </value>
+        </property>
+    </bean>
+
+    <bean id="${moduleId}.ScriptSiteHierarchyService" class="${project.artifactId}.script.ScriptSiteHierarchyService" parent="baseJavaScriptExtension">
+        <property name="extensionName" value="siteHierarchies" />
+        <property name="scriptSiteService" ref="siteServiceScript" />
+        <property name="siteHierarchyService" ref="${moduleId}.SiteHierarchyService" />
+    </bean>
+</beans>

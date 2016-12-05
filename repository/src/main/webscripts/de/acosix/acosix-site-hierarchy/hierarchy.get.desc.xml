@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<webscript>
+    <shortname>Site Hierarchy</shortname>
+    <description>
+        Retrieves site hierarchy information for a specific site, including the immediate parent and children.
+    </description>
+    <url>/acosix/api/sites/{shortName}/hierarchy</url>
+    <format default="json">argument</format>
+    <authentication>user</authentication>
+    <transaction allow="readonly">required</transaction>
+</webscript>

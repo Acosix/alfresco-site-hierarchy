@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- xsi:schemaLocation="http://www.alfresco.org/model/dictionary/1.0 modelSchema.xsd" -->
+<model name="aco6sh:model" xmlns="http://www.alfresco.org/model/dictionary/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <description>Site Hierarchy Domain Model</description>
+    <author>Acosix GmbH</author>
+    <version>1.0</version>
+
+    <imports>
+        <import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d" />
+        <import uri="http://www.alfresco.org/model/content/1.0" prefix="cm" />
+        <import uri="http://www.alfresco.org/model/site/1.0" prefix="st" />
+    </imports>
+
+    <namespaces>
+        <namespace uri="http://acosix.de/model/siteHierarchy/1.0" prefix="aco6sh" />
+    </namespaces>
+
+    <constraints>
+    </constraints>
+
+    <types>
+    </types>
+
+    <aspects>
+    
+        <!-- marker aspect -->
+        <aspect name="aco6sh:topLevelSite">
+            <mandatory-aspects>
+                <aspect>aco6sh:hierarchySite</aspect>
+            </mandatory-aspects>
+        </aspect>
+    
+        <aspect name="aco6sh:hierarchySite">
+            <associations>
+                <child-association name="aco6sh:childSite">
+                    <source>
+                        <mandatory>false</mandatory>
+                        <many>false</many>
+                    </source>
+                    <target>
+                        <class>aco6sh:hierarchySite</class>
+                        <mandatory>false</mandatory>
+                        <many>true</many>
+                    </target>
+                </child-association>
+            </associations>
+        </aspect>
+    </aspects>
+</model>
