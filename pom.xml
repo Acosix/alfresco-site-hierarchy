@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>de.acosix.alfresco.maven</groupId>
+        <artifactId>de.acosix.alfresco.maven.module.parent</artifactId>
+        <version>1.0.0.1-SNAPSHOT</version>
+    </parent>
+
+    <groupId>de.acosix.alfresco.site.hierarchy</groupId>
+    <artifactId>de.acosix.alfresco.site.hierarchy.parent</artifactId>
+    <version>1.0.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>Acosix Alfresco Site Hierarchy - Parent</name>
+    <url>https://github.com/Acosix/alfresco-site-hierarchy</url>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:git@github.com:Acosix/alfresco-site-hierarchy.git</connection>
+        <developerConnection>scm:git:git@github.com:Acosix/alfresco-site-hierarchy.git</developerConnection>
+        <url>git@github.com:Acosix/alfresco-site-hierarchy.git</url>
+    </scm>
+
+    <developers>
+        <developer>
+            <id>AFaust</id>
+            <name>Axel Faust</name>
+            <email>axel.faust@acosix.de</email>
+            <organization>Acosix GmbH</organization>
+            <roles>
+                <role>Founder</role>
+                <role>Architect</role>
+                <role>Developer</role>
+            </roles>
+            <properties>
+                <twitter>twitter.com/ReluctantBird83</twitter>
+            </properties>
+        </developer>
+    </developers>
+
+    <properties>
+        <messages.path>acosix/site-hierarchy</messages.path>
+        <messages.packageId>acosix.site-hierarchy</messages.packageId>
+        <moduleId>acosix-site-hierarchy</moduleId>
+
+        <alfresco.distribution.version>5.0.d</alfresco.distribution.version>
+    </properties>
+
+    <dependencyManagement>
+
+    </dependencyManagement>
+
+    <build>
+
+    </build>
+
+    <modules>
+        <module>repository</module>
+        <module>share</module>
+    </modules>
+</project>
