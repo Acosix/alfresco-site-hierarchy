@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+           http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+    <bean id="${moduleId}-childSiteMembersAsParentConsumers" class="${project.artifactId}.policy.ChildSiteMembersAsParentConsumers"
+        depends-on="${moduleId}.dictionaryBootstrap">
+        <property name="policyComponent" ref="policyComponent" />
+        <property name="authorityService" ref="AuthorityService" />
+        <property name="siteService" ref="SiteService" />
+        <property name="enabled" value="\${${moduleId}.childSiteMembersAsParentConsumers.enabled}" />
+    </bean>
+
+    <bean id="${moduleId}-parentSiteMembersAsChildConsumers" class="${project.artifactId}.policy.ParentSiteMembersAsChildConsumers"
+        depends-on="${moduleId}.dictionaryBootstrap">
+        <property name="policyComponent" ref="policyComponent" />
+        <property name="authorityService" ref="AuthorityService" />
+        <property name="siteService" ref="SiteService" />
+        <property name="enabled" value="\${${moduleId}.parentSiteMembersAsChildConsumers.enabled}" />
+    </bean>
+
+</beans>

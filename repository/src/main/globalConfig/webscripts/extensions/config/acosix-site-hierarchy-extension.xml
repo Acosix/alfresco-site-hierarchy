@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<extension>
+    <modules>
+        <module>
+            <id>${moduleId} - Site Management Extension</id>
+            <description>${project.name}</description>
+            <version>${noSnapshotVersion}</version>
+            <auto-deploy>true</auto-deploy>
+            
+            <customizations>
+                <customization>
+                    <targetPackageRoot>org.alfresco.repository.site</targetPackageRoot>
+                    <sourcePackageRoot>de.acosix.${moduleId}.customisations</sourcePackageRoot>
+                </customization>
+            </customizations>
+        </module>
+    </modules>
+</extension>

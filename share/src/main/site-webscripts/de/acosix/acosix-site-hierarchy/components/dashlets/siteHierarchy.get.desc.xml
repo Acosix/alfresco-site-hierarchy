@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <webscript>
-    <shortname>Site Hierarchy Dashlet</shortname>
+    <shortname>Site Hierarchy</shortname>
     <description>
         Dashlet used to display the hierarchy of the current site or all top level (hierarchical) sites
     </description>

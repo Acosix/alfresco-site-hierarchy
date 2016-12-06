@@ -3,6 +3,7 @@
     "uri": "api/sites/${site.self.shortName?url("UTF-8")}",
     "hierarchyUri": "acosix/api/sites/${site.self.shortName?url("UTF-8")}/hierarchy",
     <#if site.self.node?exists>
+        "nodeRef" : "${site.self.node.storeType}://${site.self.node.storeId}/${site.self.node.id}",
         "nodeUri": "api/node/${site.self.node.storeType}/${site.self.node.storeId}/${site.self.node.id}",
     </#if>
     "shortName": "${site.self.shortName}",
