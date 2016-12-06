@@ -6,6 +6,8 @@
             <description>${project.name}</description>
             <version>${noSnapshotVersion}</version>
             <auto-deploy>true</auto-deploy>
+            
+            <evaluator type="${moduleId}.siteManagementExtensionEvaluator" />
 
             <customizations>
                 <customization>

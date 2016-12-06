@@ -19,5 +19,8 @@
            http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
+    <bean id="${moduleId}.siteManagementExtensionEvaluator" class="de.acosix.alfresco.utility.share.surf.ShareGlobalEnabledModuleEvaluator">
+        <property name="enabled" value="\${${moduleId}.siteManagementExtension.enabled}" />
+    </bean>
     
 </beans>
