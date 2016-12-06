@@ -4,10 +4,13 @@ function handleSiteHierarchyData(newSite)
     if (json && json.has('parentSite'))
     {
         parentSiteNodeRefStr = json.get('parentSite');
-        parentSiteNode = search.findNode(parentSiteNodeRefStr);
-        if (parentSiteNode)
+        if (String(parentSiteNodeRefStr) !== '')
         {
-            siteHierarchies.addChildSite(parentSiteNode.name, newSite.shortName);
+            parentSiteNode = search.findNode(parentSiteNodeRefStr);
+            if (parentSiteNode)
+            {
+                siteHierarchies.addChildSite(parentSiteNode.name, newSite.shortName);
+            }
         }
     }
 }

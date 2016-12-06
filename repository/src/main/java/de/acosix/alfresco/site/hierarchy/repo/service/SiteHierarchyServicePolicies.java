@@ -30,7 +30,9 @@ public interface SiteHierarchyServicePolicies
     interface BeforeAddChildSitePolicy extends ClassPolicy
     {
 
-        static final QName QNAME = QName.createQName(SiteHierarchyModel.SERVICE_NAMESPACE_URI, "beforeAddChildSite");
+        static final String NAMESPACE = SiteHierarchyModel.SERVICE_NAMESPACE_URI;
+
+        static final QName QNAME = QName.createQName(NAMESPACE, "beforeAddChildSite");
 
         void beforeAddChildSite(SiteInfo parentSiteInfo, SiteInfo childSiteInfo);
     }
@@ -38,7 +40,9 @@ public interface SiteHierarchyServicePolicies
     interface OnAddChildSitePolicy extends ClassPolicy
     {
 
-        static final QName QNAME = QName.createQName(SiteHierarchyModel.SERVICE_NAMESPACE_URI, "onAddChildSite");
+        static final String NAMESPACE = SiteHierarchyModel.SERVICE_NAMESPACE_URI;
+
+        static final QName QNAME = QName.createQName(NAMESPACE, "onAddChildSite");
 
         void onAddChildSite(SiteInfo parentSiteInfo, SiteInfo childSiteInfo);
     }
@@ -46,7 +50,9 @@ public interface SiteHierarchyServicePolicies
     interface BeforeRemoveChildSitePolicy extends ClassPolicy
     {
 
-        static final QName QNAME = QName.createQName(SiteHierarchyModel.SERVICE_NAMESPACE_URI, "beforeRemoveChildSite");
+        static final String NAMESPACE = SiteHierarchyModel.SERVICE_NAMESPACE_URI;
+
+        static final QName QNAME = QName.createQName(NAMESPACE, "beforeRemoveChildSite");
 
         void beforeRemoveChildSite(SiteInfo parentSiteInfo, SiteInfo childSiteInfo);
     }
@@ -54,7 +60,9 @@ public interface SiteHierarchyServicePolicies
     interface OnRemoveChildSitePolicy extends ClassPolicy
     {
 
-        static final QName QNAME = QName.createQName(SiteHierarchyModel.SERVICE_NAMESPACE_URI, "onRemoveChildSite");
+        static final String NAMESPACE = SiteHierarchyModel.SERVICE_NAMESPACE_URI;
+
+        static final QName QNAME = QName.createQName(NAMESPACE, "onRemoveChildSite");
 
         void onRemoveChildSite(SiteInfo parentSiteInfo, SiteInfo childSiteInfo);
     }
