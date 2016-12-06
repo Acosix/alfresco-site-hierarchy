@@ -22,11 +22,18 @@ import org.alfresco.service.namespace.QName;
 import de.acosix.alfresco.site.hierarchy.repo.model.SiteHierarchyModel;
 
 /**
+ * Collection of interfaces for policies allowing reacting to events of the {@link SiteHierarchyService}.
+ *
  * @author Axel Faust, <a href="http://acosix.de">Acosix GmbH</a>
  */
 public interface SiteHierarchyServicePolicies
 {
 
+    /**
+     * Policy interface to react to the event triggered before a site is added as a child of another.
+     *
+     * @author Axel Faust, <a href="http://acosix.de">Acosix GmbH</a>
+     */
     interface BeforeAddChildSitePolicy extends ClassPolicy
     {
 
@@ -34,9 +41,22 @@ public interface SiteHierarchyServicePolicies
 
         static final QName QNAME = QName.createQName(NAMESPACE, "beforeAddChildSite");
 
+        /**
+         * Handles the pending addition of a site as the child of another.
+         *
+         * @param parentSiteInfo
+         *            the intended parent site
+         * @param childSiteInfo
+         *            the child site
+         */
         void beforeAddChildSite(SiteInfo parentSiteInfo, SiteInfo childSiteInfo);
     }
 
+    /**
+     * Policy interface to react to the event triggered after a site has been added as a child of another.
+     *
+     * @author Axel Faust, <a href="http://acosix.de">Acosix GmbH</a>
+     */
     interface OnAddChildSitePolicy extends ClassPolicy
     {
 
@@ -44,9 +64,22 @@ public interface SiteHierarchyServicePolicies
 
         static final QName QNAME = QName.createQName(NAMESPACE, "onAddChildSite");
 
+        /**
+         * Handles the addition of a site as the child of another.
+         *
+         * @param parentSiteInfo
+         *            the parent site
+         * @param childSiteInfo
+         *            the child site
+         */
         void onAddChildSite(SiteInfo parentSiteInfo, SiteInfo childSiteInfo);
     }
 
+    /**
+     * Policy interface to react to the event triggered before a site is removed as a child of another.
+     *
+     * @author Axel Faust, <a href="http://acosix.de">Acosix GmbH</a>
+     */
     interface BeforeRemoveChildSitePolicy extends ClassPolicy
     {
 
@@ -54,9 +87,22 @@ public interface SiteHierarchyServicePolicies
 
         static final QName QNAME = QName.createQName(NAMESPACE, "beforeRemoveChildSite");
 
+        /**
+         * Handles the pending removal of a site as the child of another.
+         *
+         * @param parentSiteInfo
+         *            the intended parent site
+         * @param childSiteInfo
+         *            the child site
+         */
         void beforeRemoveChildSite(SiteInfo parentSiteInfo, SiteInfo childSiteInfo);
     }
 
+    /**
+     * Policy interface to react to the event triggered after a site has been removed as a child to another.
+     *
+     * @author Axel Faust, <a href="http://acosix.de">Acosix GmbH</a>
+     */
     interface OnRemoveChildSitePolicy extends ClassPolicy
     {
 
@@ -64,6 +110,14 @@ public interface SiteHierarchyServicePolicies
 
         static final QName QNAME = QName.createQName(NAMESPACE, "onRemoveChildSite");
 
+        /**
+         * Handles the removal of a site as the child of another.
+         *
+         * @param parentSiteInfo
+         *            the previous parent site
+         * @param childSiteInfo
+         *            the child site
+         */
         void onRemoveChildSite(SiteInfo parentSiteInfo, SiteInfo childSiteInfo);
     }
 }

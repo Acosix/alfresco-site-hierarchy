@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.node.NodeServicePolicies.BeforeRemoveAspectPolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnCreateChildAssociationPolicy;
@@ -363,7 +364,8 @@ public class SiteHierarchyServiceImpl implements SiteHierarchyService, Initializ
                     SiteHierarchyModel.ASSOC_CHILD_SITE, RegexQNamePattern.MATCH_ALL);
             if (!parentSiteAssocs.isEmpty())
             {
-                // TODO Proper exception
+                throw new AlfrescoRuntimeException("acosix-site-hierarchy.error.childSiteHasParent",
+                        new Object[] { parentSite, childSite });
             }
         }
 
@@ -424,7 +426,8 @@ public class SiteHierarchyServiceImpl implements SiteHierarchyService, Initializ
                 SiteHierarchyModel.ASSOC_CHILD_SITE, RegexQNamePattern.MATCH_ALL);
         if (parentSiteAssocs.isEmpty() || !EqualsHelper.nullSafeEquals(parentSiteNodeRef, parentSiteAssocs.get(0).getParentRef()))
         {
-            // TODO Proper exception
+            throw new AlfrescoRuntimeException("acosix-site-hierarchy.error.childSiteHasDifferentParent",
+                    new Object[] { parentSite, childSite });
         }
 
         LOGGER.debug("Removing child site {} from parent {}", childSite, parentSite);
