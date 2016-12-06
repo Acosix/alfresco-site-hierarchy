@@ -21,6 +21,11 @@
             <groupId>org.alfresco</groupId>
             <artifactId>alfresco-repository</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>de.acosix.alfresco.utility</groupId>
+            <artifactId>de.acosix.alfresco.utility.repo</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

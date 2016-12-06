@@ -16,6 +16,11 @@
     </properties>
 
     <dependencies>
+    
+        <dependency>
+            <groupId>de.acosix.alfresco.utility</groupId>
+            <artifactId>de.acosix.alfresco.utility.share</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.alfresco</groupId>
@@ -134,6 +139,11 @@
             <plugin>
                 <groupId>org.alfresco.maven.plugin</groupId>
                 <artifactId>alfresco-maven-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>net.alchim31.maven</groupId>
+                <artifactId>yuicompressor-maven-plugin</artifactId>
             </plugin>
 
             <plugin>

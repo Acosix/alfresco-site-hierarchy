@@ -52,9 +52,10 @@
         <messages.packageId>acosix.site-hierarchy</messages.packageId>
         <moduleId>acosix-site-hierarchy</moduleId>
 
+        <utility.version>1.0.1.0-SNAPSHOT</utility.version>
         <alfresco.distribution.version>5.0.d</alfresco.distribution.version>
     </properties>
-    
+
     <repositories>
         <repository>
             <id>ossrh</id>
@@ -66,7 +67,30 @@
     </repositories>
 
     <dependencyManagement>
+        <dependencies>
 
+            <dependency>
+                <groupId>de.acosix.alfresco.utility</groupId>
+                <artifactId>de.acosix.alfresco.utility.common</artifactId>
+                <version>${utility.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>de.acosix.alfresco.utility</groupId>
+                <artifactId>de.acosix.alfresco.utility.repo</artifactId>
+                <version>${utility.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>de.acosix.alfresco.utility</groupId>
+                <artifactId>de.acosix.alfresco.utility.share</artifactId>
+                <version>${utility.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+        </dependencies>
     </dependencyManagement>
 
     <build>
