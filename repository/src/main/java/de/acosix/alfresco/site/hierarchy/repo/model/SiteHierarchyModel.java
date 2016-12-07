@@ -35,5 +35,15 @@ public interface SiteHierarchyModel
 
     static final QName ASPECT_HIERARCHY_SITE = QName.createQName(MODEL_NAMESPACE_URI, "hierarchySite");
 
+    static final QName PROP_AUTO_MEMBERSHIP_MODE = QName.createQName(MODEL_NAMESPACE_URI, "autoMembershipMode");
+
     static final QName ASSOC_CHILD_SITE = QName.createQName(MODEL_NAMESPACE_URI, "childSite");
+
+    static final String CONSTRAINT_AUTO_MEMBERSHIP_MODES_NONE = "none";
+
+    static final String CONSTRAINT_AUTO_MEMBERSHIP_MODES_SYSTEM_DEFAULT = "systemDefault";
+
+    static final String CONSTRAINT_AUTO_MEMBERSHIP_MODES_PARENT_MEMBERS_AS_CHILD_CONSUMERS = "parentMembersAsChildConsumers";
+
+    static final String CONSTRAINT_AUTO_MEMBERSHIP_MODES_CHILD_MEMBERS_AS_PARENT_CONSUMERS = "childMembersAsParentConsumers";
 }

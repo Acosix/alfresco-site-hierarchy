@@ -4,20 +4,14 @@
            http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-    <bean id="${moduleId}-childSiteMembersAsParentConsumers" class="${project.artifactId}.policy.ChildSiteMembersAsParentConsumers"
+    <bean id="${moduleId}.autoMembershipMode" class="${project.artifactId}.policy.AutoMembershipMode"
         depends-on="${moduleId}.dictionaryBootstrap">
         <property name="policyComponent" ref="policyComponent" />
         <property name="authorityService" ref="AuthorityService" />
+        <property name="nodeService" ref="NodeService" />
         <property name="siteService" ref="SiteService" />
-        <property name="enabled" value="\${${moduleId}.childSiteMembersAsParentConsumers.enabled}" />
-    </bean>
-
-    <bean id="${moduleId}-parentSiteMembersAsChildConsumers" class="${project.artifactId}.policy.ParentSiteMembersAsChildConsumers"
-        depends-on="${moduleId}.dictionaryBootstrap">
-        <property name="policyComponent" ref="policyComponent" />
-        <property name="authorityService" ref="AuthorityService" />
-        <property name="siteService" ref="SiteService" />
-        <property name="enabled" value="\${${moduleId}.parentSiteMembersAsChildConsumers.enabled}" />
+        <property name="siteHierarchyService" ref="${moduleId}.SiteHierarchyService" />
+        <property name="systemDefaultMode" value="\${${moduleId}.autoMembership.systemDefaultMode}" />
     </bean>
 
 </beans>

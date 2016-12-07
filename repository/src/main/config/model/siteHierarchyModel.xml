@@ -32,6 +32,27 @@
         </aspect>
     
         <aspect name="aco6sh:hierarchySite">
+            <properties>
+                <property name="aco6sh:autoMembershipMode">
+                    <type>d:text</type>
+                    <protected>true</protected>
+                    <mandatory>true</mandatory>
+                    <default>systemDefault</default>
+                    <index enabled="false" />
+                    <constraints>
+                        <constraint name="aco6sh:autoMembershipModes" type="LIST">
+                            <parameter name="allowedValues">
+                                <list>
+                                    <value>none</value>
+                                    <value>systemDefault</value>
+                                    <value>parentMembersAsChildConsumers</value>
+                                    <value>childMembersAsParentConsumers</value>
+                                </list>
+                            </parameter>
+                        </constraint>
+                    </constraints>
+                </property>
+            </properties>
             <associations>
                 <child-association name="aco6sh:childSite">
                     <source>
