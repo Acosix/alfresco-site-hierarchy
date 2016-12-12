@@ -1,6 +1,6 @@
 # About
 
-TBD
+This addon provides the ability to add simple hierarchies to Alfresco Share Sites. Sites will still be maintained in a flat list by Alfresco core but Alfresco administrators / site managers have the ability to manage secondary parent-child associations between sites to form tree-like hierarchies. These hierarchies can be used to automatically assign access to sites for either parent or child sites, and may be reacted upon in policies to perform custom logic.
 
 ## Compatbility
 
