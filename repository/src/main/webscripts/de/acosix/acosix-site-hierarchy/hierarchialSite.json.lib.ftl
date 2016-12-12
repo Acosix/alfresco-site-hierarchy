@@ -28,7 +28,8 @@
     "description": "${site.self.description}",
     "isPublic": "${site.self.isPublic?string("true", "false")}",
     "visibility": "${site.self.visibility}",
-    "autoMembershipMode": "${site.self.node.properties["aco6sh:autoMembershipMode"]!"systemDefault"}"
+    "autoMembershipMode": "${site.self.node.properties["aco6sh:autoMembershipMode"]!"systemDefault"}",
+    "showInHierarchyMode": "${site.self.node.properties["aco6sh:showInHierarchyMode"]!"ifParentOrChild"}"
     <#if site.parent??>,
     "parent" : <@renderSite site.parent />
     </#if>

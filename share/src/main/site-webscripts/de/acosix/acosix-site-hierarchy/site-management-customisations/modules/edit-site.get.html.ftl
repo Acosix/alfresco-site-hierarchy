@@ -8,6 +8,19 @@
     
     <div id="${el}-acosix-site-hierarchy" class="acosix-site-hierarchy customSiteFields hidden">
         <div class="yui-gd">
+            <div class="yui-u first"><label for="${el}-showInHierarchyMode">${msg("label.showInHierarchyMode")?html}:</label></div>
+            <div class="yui-u">
+                <select id="${el}-autoMembershipMode" name="aco6sh_showInHierarchyMode" tabindex="0">
+                    <#list ["ifParentOrChild", "never", "always"] as mode>
+                        <option value="${mode}"<#if mode == showInHierarchyMode> selected="selected"</#if>>${msg("label.showInHierarchyMode." + mode)?html}</option>
+                    </#list>
+                </select>
+                <div>
+                    <span class="help">${msg("help.showInHierarchyMode")?html}</span>
+                </div>
+            </div>
+        </div>
+        <div class="yui-gd">
             <div class="yui-u first"><label for="${parentSiteControlId}">${msg("label.parentSite")?html}:</label></div>
             <div class="yui-u">
                 <div id="${parentSiteControlId}" class="object-finder">

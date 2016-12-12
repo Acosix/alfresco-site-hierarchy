@@ -17,6 +17,7 @@ package de.acosix.alfresco.site.hierarchy.repo.service;
 
 import java.util.List;
 
+import org.alfresco.service.Auditable;
 import org.alfresco.service.cmr.site.SiteInfo;
 
 import de.acosix.alfresco.site.hierarchy.repo.model.SiteHierarchyModel;
@@ -28,11 +29,24 @@ public interface SiteHierarchyService
 {
 
     /**
-     * Lists all the top level {@link SiteHierarchyModel#ASPECT_HIERARCHY_SITE hierarchy sites} in the system.
+     * Lists all the top level {@link SiteHierarchyModel#ASPECT_HIERARCHY_SITE hierarchy sites} in the system. This operation respects the
+     * {@link SiteHierarchyModel#PROP_SHOW_IN_HIERARCHY_MODE showInHierarchyMode} of sites.
      *
      * @return the list of top level hierarchy sites ordered by name
      */
+    @Auditable
     List<SiteInfo> listTopLevelSites();
+
+    /**
+     * Lists all the top level {@link SiteHierarchyModel#ASPECT_HIERARCHY_SITE hierarchy sites} in the system.
+     *
+     * @return the list of top level hierarchy sites ordered by name
+     * @param respectShowInHierarchy
+     *            {@code true} if the {@link SiteHierarchyModel#PROP_SHOW_IN_HIERARCHY_MODE showInHierarchyMode} should be respected during
+     *            retrieval (e.g. sites set to never show should be filtered} or {@code false} if all top level sites should be retrieved
+     */
+    @Auditable(parameters = { "respectShowInHierarchy" })
+    List<SiteInfo> listTopLevelSites(boolean respectShowInHierarchy);
 
     /**
      * Retrieves the parent of a {@link SiteHierarchyModel#ASPECT_HIERARCHY_SITE hierarchy site}.
@@ -43,17 +57,34 @@ public interface SiteHierarchyService
      * @return the parent site or {@code null} if site is not part of a hierarchy or a {@link SiteHierarchyModel#ASPECT_TOP_LEVEL_SITE top
      *         level site}
      */
+    @Auditable(parameters = { "site" })
     SiteInfo getParentSite(String site);
 
     /**
-     * Lists all the child {@link SiteHierarchyModel#ASPECT_HIERARCHY_SITE hierarchy sites} of a specific site.
+     * Lists all the child {@link SiteHierarchyModel#ASPECT_HIERARCHY_SITE hierarchy sites} of a specific site. This operation respects the
+     * {@link SiteHierarchyModel#PROP_SHOW_IN_HIERARCHY_MODE showInHierarchyMode} of sites.
      *
      * @param parentSite
      *            the site of which to list the child sites
      *
      * @return the list of child sites ordered by name
      */
+    @Auditable(parameters = { "parentSite" })
     List<SiteInfo> listChildSites(String parentSite);
+
+    /**
+     * Lists all the child {@link SiteHierarchyModel#ASPECT_HIERARCHY_SITE hierarchy sites} of a specific site.
+     *
+     * @param parentSite
+     *            the site of which to list the child sites
+     * @param respectShowInHierarchy
+     *            {@code true} if the {@link SiteHierarchyModel#PROP_SHOW_IN_HIERARCHY_MODE showInHierarchyMode} should be respected during
+     *            retrieval (e.g. sites set to never show should be filtered} or {@code false} if all child sites should be retrieved
+     *
+     * @return the list of child sites ordered by name
+     */
+    @Auditable(parameters = { "parentSite", "respectShowInHierarchy" })
+    List<SiteInfo> listChildSites(String parentSite, boolean respectShowInHierarchy);
 
     /**
      * Adds a stand-alone / top level site as a child of another site. This operation will promote either site to a
@@ -67,6 +98,7 @@ public interface SiteHierarchyService
      *
      *
      */
+    @Auditable(parameters = { "parentSite", "childSite" })
     void addChildSite(String parentSite, String childSite);
 
     /**
@@ -77,6 +109,7 @@ public interface SiteHierarchyService
      * @param childSite
      *            the site to remove
      */
+    @Auditable(parameters = { "parentSite", "childSite" })
     void removeChildSite(String parentSite, String childSite);
 
 }

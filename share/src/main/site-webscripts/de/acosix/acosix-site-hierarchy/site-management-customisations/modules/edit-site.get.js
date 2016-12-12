@@ -23,6 +23,7 @@ function loadSiteHierarchyData(shortName)
     {
         siteProfile = JSON.parse(response.text).site || {};
         model.parentSiteNodeRef = siteProfile.parent ? siteProfile.parent.nodeRef : '';
+        model.showInHierarchyMode = siteProfile.showInHierarchyMode || 'ifParentOrChild';
         model.autoMembershipMode = siteProfile.autoMembershipMode || 'systemDefault';
     }
 }

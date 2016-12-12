@@ -31,11 +31,17 @@ public interface SiteHierarchyModel
 
     static final QName MODEL = QName.createQName(MODEL_NAMESPACE_URI, "model");
 
-    static final QName ASPECT_TOP_LEVEL_SITE = QName.createQName(MODEL_NAMESPACE_URI, "topLevelSite");
-
     static final QName ASPECT_HIERARCHY_SITE = QName.createQName(MODEL_NAMESPACE_URI, "hierarchySite");
 
+    static final QName PROP_SHOW_IN_HIERARCHY_MODE = QName.createQName(MODEL_NAMESPACE_URI, "showInHierarchyMode");
+
+    static final QName ASPECT_TOP_LEVEL_SITE = QName.createQName(MODEL_NAMESPACE_URI, "topLevelSite");
+
+    static final QName ASPECT_CHILD_SITE = QName.createQName(MODEL_NAMESPACE_URI, "childSite");
+
     static final QName PROP_AUTO_MEMBERSHIP_MODE = QName.createQName(MODEL_NAMESPACE_URI, "autoMembershipMode");
+
+    static final QName ASPECT_PARENT_SITE = QName.createQName(MODEL_NAMESPACE_URI, "parentSite");
 
     static final QName ASSOC_CHILD_SITE = QName.createQName(MODEL_NAMESPACE_URI, "childSite");
 
@@ -46,4 +52,10 @@ public interface SiteHierarchyModel
     static final String CONSTRAINT_AUTO_MEMBERSHIP_MODES_PARENT_MEMBERS_AS_CHILD_CONSUMERS = "parentMembersAsChildConsumers";
 
     static final String CONSTRAINT_AUTO_MEMBERSHIP_MODES_CHILD_MEMBERS_AS_PARENT_CONSUMERS = "childMembersAsParentConsumers";
+
+    static final String CONSTRAINT_SHOW_IN_HIERARCHY_MODES_IF_PARENT_OR_CHILD = "ifParentOrChild";
+
+    static final String CONSTRAINT_SHOW_IN_HIERARCHY_MODES_NEVER = "never";
+
+    static final String CONSTRAINT_SHOW_IN_HIERARCHY_MODES_ALWAYS = "always";
 }

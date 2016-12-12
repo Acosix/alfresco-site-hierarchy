@@ -23,15 +23,44 @@
     </types>
 
     <aspects>
-    
-        <!-- marker aspect -->
+
+        <!-- base aspect for marking purposes -->
+        <aspect name="aco6sh:hierarchySite">
+            <properties>
+                <property name="aco6sh:showInHierarchyMode">
+                    <type>d:text</type>
+                    <mandatory>true</mandatory>
+                    <default>ifParentOrChild</default>
+                    <index enabled="true">
+                        <atomic>true</atomic>
+                        <stored>false</stored>
+                        <tokenised>false</tokenised>
+                        <facetable>true</facetable>
+                    </index>
+                    <constraints>
+                        <constraint name="aco6sh:showInHierarchyModes" type="LIST">
+                            <parameter name="allowedValues">
+                                <list>
+                                    <value>ifParentOrChild</value>
+                                    <value>never</value>
+                                    <value>always</value>
+                                </list>
+                            </parameter>
+                        </constraint>
+                    </constraints>
+                </property>
+            </properties>
+        </aspect>
+        
+        <!-- marker aspect for sites to be shown at the top level of the hierarchy -->
         <aspect name="aco6sh:topLevelSite">
             <mandatory-aspects>
                 <aspect>aco6sh:hierarchySite</aspect>
             </mandatory-aspects>
         </aspect>
-    
-        <aspect name="aco6sh:hierarchySite">
+
+        <aspect name="aco6sh:childSite">
+            <parent>aco6sh:hierarchySite</parent>
             <properties>
                 <property name="aco6sh:autoMembershipMode">
                     <type>d:text</type>
@@ -53,6 +82,10 @@
                     </constraints>
                 </property>
             </properties>
+        </aspect>
+
+        <aspect name="aco6sh:parentSite">
+            <parent>aco6sh:hierarchySite</parent>
             <associations>
                 <child-association name="aco6sh:childSite">
                     <source>
@@ -60,12 +93,13 @@
                         <many>false</many>
                     </source>
                     <target>
-                        <class>aco6sh:hierarchySite</class>
+                        <class>aco6sh:childSite</class>
                         <mandatory>false</mandatory>
                         <many>true</many>
                     </target>
                 </child-association>
             </associations>
         </aspect>
+
     </aspects>
 </model>

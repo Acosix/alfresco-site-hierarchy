@@ -16,8 +16,8 @@
 
 function handleSiteHierarchyData(newSite)
 {
-    var siteNode, autoMembershipMode, parentSiteNodeRefStr, parentSiteNode;
-
+    var siteNode, propertiesChanged, showInHierarchyMode, autoMembershipMode, parentSiteNodeRefStr, parentSiteNode;
+    
     if (json && json.has('aco6sh_parentSite_removed'))
     {
         parentSiteNodeRefStr = json.get('aco6sh_parentSite_removed');
@@ -31,17 +31,36 @@ function handleSiteHierarchyData(newSite)
         }
     }
     
+    if (json && json.has('aco6sh_showInHierarchyMode'))
+    {
+        showInHierarchyMode = json.get('aco6sh_showInHierarchyMode');
+        if (String(showInHierarchyMode) !== '')
+        {
+            siteNode = model.site.node;
+            siteNode.properties['aco6sh:showInHierarchyMode'] = showInHierarchyMode;
+            propertiesChanged = true;
+        }
+    }
+    
     if (json && json.has('aco6sh_autoMembershipMode'))
     {
         autoMembershipMode = json.get('aco6sh_autoMembershipMode');
         if (String(autoMembershipMode) !== '')
         {
-            siteNode = model.site.node;
-            siteNode.properties['aco6sh:autoMembershipMode'] = autoMembershipMode;
-            siteNode.save();
+            siteNode = siteNode || model.site.node;
+            if (String(autoMembershipMode) !== 'systemDefault' || siteNode.properties['aco6sh:autoMembershipMode'] !== null)
+            {
+                siteNode.properties['aco6sh:autoMembershipMode'] = autoMembershipMode;
+                propertiesChanged = true;
+            }
         }
     }
 
+    if (propertiesChanged === true && siteNode)
+    {
+        siteNode.save();
+    }
+    
     if (json && json.has('aco6sh_parentSite_added'))
     {
         parentSiteNodeRefStr = json.get('aco6sh_parentSite_added');

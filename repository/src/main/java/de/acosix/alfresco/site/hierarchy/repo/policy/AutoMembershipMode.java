@@ -191,14 +191,14 @@ public class AutoMembershipMode implements InitializingBean, OnAddChildSitePolic
                         final SiteInfo parentSiteInfo = this.siteHierarchyService.getParentSite(childSiteInfo.getShortName());
                         if (parentSiteInfo != null)
                         {
+                            this.removeAnyAutoRelations(childSiteInfo, parentSiteInfo);
+                            this.applyAutoRelation(childSiteInfo, parentSiteInfo, modeAfter);
                         }
                         else
                         {
                             LOGGER.debug("Site {} has no parent - no need to update anything", childSiteInfo.getShortName());
                         }
 
-                        this.removeAnyAutoRelations(childSiteInfo, parentSiteInfo);
-                        this.applyAutoRelation(childSiteInfo, parentSiteInfo, modeAfter);
                         return null;
                     });
                 }

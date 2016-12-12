@@ -23,14 +23,13 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.node.NodeServicePolicies.BeforeRemoveAspectPolicy;
+import org.alfresco.repo.node.NodeServicePolicies.OnAddAspectPolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnCreateChildAssociationPolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnDeleteChildAssociationPolicy;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
@@ -41,7 +40,6 @@ import org.alfresco.repo.site.SiteDoesNotExistException;
 import org.alfresco.repo.site.SiteModel;
 import org.alfresco.repo.tenant.TenantService;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
-import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -73,7 +71,7 @@ import de.acosix.alfresco.site.hierarchy.repo.service.SiteHierarchyServicePolici
  * @author Axel Faust, <a href="http://acosix.de">Acosix GmbH</a>
  */
 public class SiteHierarchyServiceImpl implements SiteHierarchyService, InitializingBean, OnCreateChildAssociationPolicy,
-        OnDeleteChildAssociationPolicy, BeforeRemoveAspectPolicy
+        OnDeleteChildAssociationPolicy, OnAddAspectPolicy, BeforeRemoveAspectPolicy
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SiteHierarchyServiceImpl.class);
@@ -126,6 +124,8 @@ public class SiteHierarchyServiceImpl implements SiteHierarchyService, Initializ
                 SiteHierarchyModel.ASSOC_CHILD_SITE,
                 new JavaBehaviour(this, "onDeleteChildAssociation", NotificationFrequency.EVERY_EVENT));
 
+        this.policyComponent.bindClassBehaviour(OnAddAspectPolicy.QNAME, SiteHierarchyModel.ASPECT_HIERARCHY_SITE,
+                new JavaBehaviour(this, "onAddAspect", NotificationFrequency.EVERY_EVENT));
         this.policyComponent.bindClassBehaviour(BeforeRemoveAspectPolicy.QNAME, SiteHierarchyModel.ASPECT_HIERARCHY_SITE,
                 new JavaBehaviour(this, "beforeRemoveAspect", NotificationFrequency.EVERY_EVENT));
 
@@ -217,6 +217,16 @@ public class SiteHierarchyServiceImpl implements SiteHierarchyService, Initializ
     @Override
     public List<SiteInfo> listTopLevelSites()
     {
+        return this.listTopLevelSites(true);
+    }
+
+    /**
+     *
+     * {@inheritDoc}
+     */
+    @Override
+    public List<SiteInfo> listTopLevelSites(final boolean respectShowInHierarchyMode)
+    {
         LOGGER.debug("Listing top level sites");
 
         final SearchParameters sp = new SearchParameters();
@@ -225,8 +235,23 @@ public class SiteHierarchyServiceImpl implements SiteHierarchyService, Initializ
         sp.setLanguage(SearchService.LANGUAGE_FTS_ALFRESCO);
 
         final MessageFormat queryFormat = new MessageFormat("TYPE:\"{0}\" AND ASPECT:\"{1}\"", Locale.ENGLISH);
-        final String query = queryFormat.format(new Object[] { SiteModel.TYPE_SITE.toPrefixString(this.namespaceService),
+        String query = queryFormat.format(new Object[] { SiteModel.TYPE_SITE.toPrefixString(this.namespaceService),
                 SiteHierarchyModel.ASPECT_TOP_LEVEL_SITE.toPrefixString(this.namespaceService) });
+
+        if (respectShowInHierarchyMode)
+        {
+            // this will cause db-fts not to be used
+            final MessageFormat queryFilterFormat = new MessageFormat("={0}:{1} OR (={0}:{2} AND ASPECT:\"{3}\")", Locale.ENGLISH);
+            final String queryFilter = queryFilterFormat
+                    .format(new Object[] { SiteHierarchyModel.PROP_SHOW_IN_HIERARCHY_MODE.toPrefixString(this.namespaceService),
+                            SiteHierarchyModel.CONSTRAINT_SHOW_IN_HIERARCHY_MODES_ALWAYS,
+                            SiteHierarchyModel.CONSTRAINT_SHOW_IN_HIERARCHY_MODES_IF_PARENT_OR_CHILD,
+                            SiteHierarchyModel.ASPECT_PARENT_SITE.toPrefixString(this.namespaceService) });
+            // if we did not want to support 5.0.d we could use filter query support
+            // TODO find a way to dynamically use filter query support WITHOUT reflection
+            query = query + " AND (" + queryFilter + ")";
+        }
+
         sp.setQuery(query);
 
         LOGGER.debug("Using FTS query \"{}\" to list top level sites", query);
@@ -300,6 +325,16 @@ public class SiteHierarchyServiceImpl implements SiteHierarchyService, Initializ
     @Override
     public List<SiteInfo> listChildSites(final String parentSite)
     {
+        return this.listChildSites(parentSite, true);
+    }
+
+    /**
+     *
+     * {@inheritDoc}
+     */
+    @Override
+    public List<SiteInfo> listChildSites(final String parentSite, final boolean respectShowInHierarchyMode)
+    {
         ParameterCheck.mandatoryString("parentSite", parentSite);
         final SiteInfo parentSiteInfo = this.siteService.getSite(parentSite);
 
@@ -312,6 +347,14 @@ public class SiteHierarchyServiceImpl implements SiteHierarchyService, Initializ
 
         final List<ChildAssociationRef> childSiteAssocs = this.nodeService.getChildAssocs(parentSiteInfo.getNodeRef(),
                 SiteHierarchyModel.ASSOC_CHILD_SITE, RegexQNamePattern.MATCH_ALL);
+        if (respectShowInHierarchyMode)
+        {
+            final List<ChildAssociationRef> childSiteAssocsNeverToShow = this.nodeService.getChildAssocsByPropertyValue(
+                    parentSiteInfo.getNodeRef(), SiteHierarchyModel.PROP_SHOW_IN_HIERARCHY_MODE,
+                    SiteHierarchyModel.CONSTRAINT_SHOW_IN_HIERARCHY_MODES_NEVER);
+            childSiteAssocs.removeAll(childSiteAssocsNeverToShow);
+        }
+
         final List<SiteInfo> childSites = new ArrayList<>(childSiteAssocs.size());
         childSiteAssocs.forEach(childSiteAssoc -> {
             final SiteInfo site = this.siteService.getSite(childSiteAssoc.getChildRef());
@@ -357,8 +400,8 @@ public class SiteHierarchyServiceImpl implements SiteHierarchyService, Initializ
         final NodeRef parentSiteNodeRef = parentSiteInfo.getNodeRef();
         final NodeRef childSiteNodeRef = childSiteInfo.getNodeRef();
 
-        final boolean childIsHiearchySite = this.nodeService.hasAspect(childSiteNodeRef, SiteHierarchyModel.ASPECT_HIERARCHY_SITE);
-        if (childIsHiearchySite)
+        final boolean childIsChildSite = this.nodeService.hasAspect(childSiteNodeRef, SiteHierarchyModel.ASPECT_CHILD_SITE);
+        if (childIsChildSite)
         {
             final List<ChildAssociationRef> parentSiteAssocs = this.nodeService.getParentAssocs(childSiteNodeRef,
                     SiteHierarchyModel.ASSOC_CHILD_SITE, RegexQNamePattern.MATCH_ALL);
@@ -373,19 +416,17 @@ public class SiteHierarchyServiceImpl implements SiteHierarchyService, Initializ
 
         this.invokeBeforeAddChildSite(parentSiteInfo, childSiteInfo);
 
-        if (!childIsHiearchySite)
+        if (!childIsChildSite)
         {
-            LOGGER.debug("Adding hierarchySite aspect to child site {}", childSite);
-            this.nodeService.addAspect(childSiteNodeRef, SiteHierarchyModel.ASPECT_HIERARCHY_SITE,
+            LOGGER.debug("Adding childSite aspect to child site {}", childSite);
+            this.nodeService.addAspect(childSiteNodeRef, SiteHierarchyModel.ASPECT_CHILD_SITE,
                     Collections.<QName, Serializable> emptyMap());
         }
 
-        if (!this.nodeService.hasAspect(parentSiteNodeRef, SiteHierarchyModel.ASPECT_HIERARCHY_SITE))
+        if (!this.nodeService.hasAspect(parentSiteNodeRef, SiteHierarchyModel.ASPECT_PARENT_SITE))
         {
-            LOGGER.debug("Adding hierarchySite and topLevelSite aspects to parent site {}", parentSite);
-            this.nodeService.addAspect(parentSiteNodeRef, SiteHierarchyModel.ASPECT_TOP_LEVEL_SITE,
-                    Collections.<QName, Serializable> emptyMap());
-            this.nodeService.addAspect(parentSiteNodeRef, SiteHierarchyModel.ASPECT_HIERARCHY_SITE,
+            LOGGER.debug("Adding parentSite aspect to parent site {}", parentSite);
+            this.nodeService.addAspect(parentSiteNodeRef, SiteHierarchyModel.ASPECT_PARENT_SITE,
                     Collections.<QName, Serializable> emptyMap());
         }
 
@@ -475,40 +516,52 @@ public class SiteHierarchyServiceImpl implements SiteHierarchyService, Initializ
             final NodeRef childRef = childAssocRef.getChildRef();
             LOGGER.debug("onDeleteChildAssociation - {} removed as child of {}", childRef, parentRef);
 
-            final List<ChildAssociationRef> transientChildSiteAssocs = this.nodeService.getChildAssocs(childRef,
+            final List<ChildAssociationRef> remainingParentChildSiteAssocs = this.nodeService.getChildAssocs(parentRef,
                     SiteHierarchyModel.ASSOC_CHILD_SITE, RegexQNamePattern.MATCH_ALL);
-            if (transientChildSiteAssocs.isEmpty())
+            if (remainingParentChildSiteAssocs.isEmpty())
             {
-                LOGGER.debug("Ex-child {} has no child sites itself - checking user properties", childRef);
-                final Map<QName, Serializable> childProperties = this.nodeService.getProperties(childRef);
-
-                final Map<QName, PropertyDefinition> modelProperties = this.dictionaryService
-                        .getClass(SiteHierarchyModel.ASPECT_HIERARCHY_SITE).getProperties();
-                final AtomicBoolean userPropertiesRemaining = new AtomicBoolean(false);
-                modelProperties.forEach((propertyQName, propertyDefinition) -> {
-                    if (childProperties.containsKey(propertyQName) && !propertyDefinition.isProtected())
-                    {
-                        userPropertiesRemaining.compareAndSet(false, childProperties.get(propertyQName) != null);
-                    }
-                });
-
-                if (!userPropertiesRemaining.get())
-                {
-                    LOGGER.debug("No user properties of aspect hierarchySite left on {} - removing aspect", childRef);
-                    this.nodeService.removeAspect(childRef, SiteHierarchyModel.ASPECT_HIERARCHY_SITE);
-                }
-                else
-                {
-                    LOGGER.debug("Adding topLevelSite aspect to {}", childRef);
-                    this.nodeService.addAspect(childRef, SiteHierarchyModel.ASPECT_TOP_LEVEL_SITE,
-                            Collections.<QName, Serializable> emptyMap());
-                }
+                LOGGER.debug("Ex-parent {} has no other child sites - removing parentSite aspect", parentRef);
+                this.nodeService.removeAspect(parentRef, SiteHierarchyModel.ASPECT_PARENT_SITE);
             }
-            else
+
+            LOGGER.debug("Removing childSite aspect from ex-child {}", childRef);
+            this.nodeService.removeAspect(childRef, SiteHierarchyModel.ASPECT_CHILD_SITE);
+
+            LOGGER.debug("Adding topLevelSite aspect to ex-child {}", childRef);
+            this.nodeService.addAspect(childRef, SiteHierarchyModel.ASPECT_TOP_LEVEL_SITE, Collections.<QName, Serializable> emptyMap());
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onAddAspect(final NodeRef nodeRef, final QName aspectTypeQName)
+    {
+        if (StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.equals(nodeRef.getStoreRef()))
+        {
+            LOGGER.debug("onAddAspect - {} added to {}", aspectTypeQName, nodeRef);
+            if (this.dictionaryService.isSubClass(aspectTypeQName, SiteHierarchyModel.ASPECT_HIERARCHY_SITE))
             {
-                LOGGER.debug("Adding topLevelSite aspect to {}", childRef);
-                this.nodeService.addAspect(childRef, SiteHierarchyModel.ASPECT_TOP_LEVEL_SITE,
-                        Collections.<QName, Serializable> emptyMap());
+                final QName type = this.nodeService.getType(nodeRef);
+                if (!this.dictionaryService.isSubClass(type, SiteModel.TYPE_SITE))
+                {
+                    throw new IllegalStateException("Aspects for a hierarchy sites may only be applied to actual site nodes");
+                }
+
+                if (!this.nodeService.hasAspect(nodeRef, SiteHierarchyModel.ASPECT_TOP_LEVEL_SITE))
+                {
+                    final List<ChildAssociationRef> parentSiteAssocs = this.nodeService.getParentAssocs(nodeRef,
+                            SiteHierarchyModel.ASSOC_CHILD_SITE, RegexQNamePattern.MATCH_ALL);
+                    if (parentSiteAssocs.isEmpty())
+                    {
+                        // expected case during site creation
+                        LOGGER.debug("Adding topLevelSite aspect to site {}",
+                                this.nodeService.getProperty(nodeRef, ContentModel.PROP_NAME));
+                        this.nodeService.addAspect(nodeRef, SiteHierarchyModel.ASPECT_TOP_LEVEL_SITE,
+                                Collections.<QName, Serializable> emptyMap());
+                    }
+                }
             }
         }
     }
