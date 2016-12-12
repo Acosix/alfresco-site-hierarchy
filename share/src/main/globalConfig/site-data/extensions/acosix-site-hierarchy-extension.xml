@@ -2,8 +2,22 @@
 <extension>
     <modules>
         <module>
+            <id>${moduleId} - Base Extensions</id>
+            <description>${project.name} - Base Extensions</description>
+            <version>${noSnapshotVersion}</version>
+            <auto-deploy>true</auto-deploy>
+            
+            <customizations>
+                <customization>
+                    <targetPackageRoot>org.alfresco</targetPackageRoot>
+                    <sourcePackageRoot>de.acosix.${moduleId}.base-customisations</sourcePackageRoot>
+                </customization>
+            </customizations>
+        </module>
+    
+        <module>
             <id>${moduleId} - Site Management Extension</id>
-            <description>${project.name}</description>
+            <description>${project.name} - Site Management Extension</description>
             <version>${noSnapshotVersion}</version>
             <auto-deploy>true</auto-deploy>
             
@@ -12,12 +26,12 @@
             <customizations>
                 <customization>
                     <targetPackageRoot>org.alfresco</targetPackageRoot>
-                    <sourcePackageRoot>de.acosix.${moduleId}.customisations</sourcePackageRoot>
+                    <sourcePackageRoot>de.acosix.${moduleId}.site-management-customisations</sourcePackageRoot>
                 </customization>
 
                 <customization>
                     <targetPackageRoot>org.alfresco.share.pages</targetPackageRoot>
-                    <sourcePackageRoot>de.acosix.${moduleId}.customisations.share.header</sourcePackageRoot>
+                    <sourcePackageRoot>de.acosix.${moduleId}.site-management-customisations.share.header</sourcePackageRoot>
                     <alwaysApply>
                         <webscript>share-header</webscript>
                     </alwaysApply>
