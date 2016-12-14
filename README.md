@@ -22,7 +22,7 @@ These allow a site to be defined as a "child site" of another. The membership li
 
 ![Create Site Dialog](/src/images/site hierarchy - create site.png)
 
-This customisation is defined by a Surf extension module and can be disabled by either undeploying the module or setting the *acosix-site-hierarchy.siteManagementExtension.enabled* property to *false* in *<configRoot>/share-global.properties* (support for *share-global.properties* is added by the dependency module *de.acosix.alfresco.utility.share* to provide a means of configuring Share customisations via a central properties file similar to Repository-tier *alfresco-global.properties*).
+This customisation is defined by a Surf extension module and can be disabled by either undeploying the module or setting the *acosix-site-hierarchy.siteManagementExtension.enabled* property to *false* in *&lt;configRoot&gt;/share-global.properties* (support for *share-global.properties* is added by the dependency module *de.acosix.alfresco.utility.share* to provide a means of configuring Share customisations via a central properties file similar to Repository-tier *alfresco-global.properties*).
 
 ### Site Hierarchy Dashlet
 
