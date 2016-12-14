@@ -21,6 +21,7 @@
     <#if site.self.node?exists>
         "nodeRef" : "${site.self.node.storeType}://${site.self.node.storeId}/${site.self.node.id}",
         "nodeUri": "api/node/${site.self.node.storeType}/${site.self.node.storeId}/${site.self.node.id}",
+        "tagScope": "api/tagscopes/${site.self.node.storeType}/${site.self.node.storeId}/${site.self.node.id}",
     </#if>
     "shortName": "${site.self.shortName}",
     "sitePreset": "${site.self.sitePreset}",
@@ -28,8 +29,8 @@
     "description": "${site.self.description}",
     "isPublic": "${site.self.isPublic?string("true", "false")}",
     "visibility": "${site.self.visibility}",
-    "autoMembershipMode": "${site.self.node.properties["aco6sh:autoMembershipMode"]!"systemDefault"}",
-    "showInHierarchyMode": "${site.self.node.properties["aco6sh:showInHierarchyMode"]!"ifParentOrChild"}"
+    "autoMembershipMode": "${site.self.node.properties["aco6sh:autoMembershipMode"]!"none"}",
+    "showInHierarchyMode": "${site.self.node.properties["aco6sh:showInHierarchyMode"]!"never"}"
     <#if site.parent??>,
     "parent" : <@renderSite site.parent />
     </#if>

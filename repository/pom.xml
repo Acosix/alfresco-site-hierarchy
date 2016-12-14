@@ -13,19 +13,36 @@
     <name>Acosix Alfresco Site Hierarchy - Repository Module</name>
 
     <properties>
-
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.alfresco</groupId>
             <artifactId>alfresco-repository</artifactId>
+            <!-- can mess with tests using a Servlet 3.0 container -->
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>servlet-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
             <groupId>de.acosix.alfresco.utility</groupId>
             <artifactId>de.acosix.alfresco.utility.repo</artifactId>
         </dependency>
+        
+        <dependency>
+            <groupId>de.acosix.alfresco.utility</groupId>
+            <artifactId>de.acosix.alfresco.utility.repo</artifactId>
+            <classifier>tests</classifier>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -97,6 +114,10 @@
             <plugin>
                 <artifactId>maven-source-plugin</artifactId>
             </plugin>
+            
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+            </plugin>
 
             <plugin>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -134,5 +155,4 @@
         </plugins>
 
     </build>
-
 </project>

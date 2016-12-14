@@ -172,7 +172,7 @@ if (typeof Acosix === 'undefined' || !Acosix)
                     var result, sites, site, idx, newNode;
 
                     result = YAHOO.lang.JSON.parse(oResponse.responseText);
-                    sites = (result.site && result.site.children) ? result.site.children : (result.sites || []);
+                    sites = result.children || result.sites || [];
 
                     if (sites.length > 0)
                     {
