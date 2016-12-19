@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-function handleSiteHierarchyData(newSite)
+function handleSiteHierarchyData(childSite)
 {
     var siteNode, propertiesChanged, showInHierarchyMode, autoMembershipMode, parentSiteNodeRefStr, parentSiteNode;
     
@@ -26,7 +26,7 @@ function handleSiteHierarchyData(newSite)
             parentSiteNode = search.findNode(parentSiteNodeRefStr);
             if (parentSiteNode)
             {
-                siteHierarchies.removeChildSite(parentSiteNode.name, newSite.shortName);
+                siteHierarchies.removeChildSite(parentSiteNode.name, childSite.shortName);
             }
         }
     }
@@ -69,7 +69,7 @@ function handleSiteHierarchyData(newSite)
             parentSiteNode = search.findNode(parentSiteNodeRefStr);
             if (parentSiteNode)
             {
-                siteHierarchies.addChildSite(parentSiteNode.name, newSite.shortName);
+                siteHierarchies.addChildSite(parentSiteNode.name, childSite.shortName);
             }
         }
     }

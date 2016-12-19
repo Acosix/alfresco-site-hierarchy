@@ -20,11 +20,14 @@ import java.text.Collator;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
@@ -39,6 +42,7 @@ import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.site.SiteDoesNotExistException;
 import org.alfresco.repo.site.SiteModel;
 import org.alfresco.repo.tenant.TenantService;
+import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -521,11 +525,18 @@ public class SiteHierarchyServiceImpl implements SiteHierarchyService, Initializ
             if (remainingParentChildSiteAssocs.isEmpty())
             {
                 LOGGER.debug("Ex-parent {} has no other child sites - removing parentSite aspect", parentRef);
-                this.nodeService.removeAspect(parentRef, SiteHierarchyModel.ASPECT_PARENT_SITE);
+
+                this.withAspectInheritedPropertyRemovalGuard(parentRef, SiteHierarchyModel.ASPECT_HIERARCHY_SITE, () -> {
+                    this.nodeService.removeAspect(parentRef, SiteHierarchyModel.ASPECT_PARENT_SITE);
+                    return null;
+                });
             }
 
             LOGGER.debug("Removing childSite aspect from ex-child {}", childRef);
-            this.nodeService.removeAspect(childRef, SiteHierarchyModel.ASPECT_CHILD_SITE);
+            this.withAspectInheritedPropertyRemovalGuard(childRef, SiteHierarchyModel.ASPECT_HIERARCHY_SITE, () -> {
+                this.nodeService.removeAspect(childRef, SiteHierarchyModel.ASPECT_CHILD_SITE);
+                return null;
+            });
 
             LOGGER.debug("Adding topLevelSite aspect to ex-child {}", childRef);
             this.nodeService.addAspect(childRef, SiteHierarchyModel.ASPECT_TOP_LEVEL_SITE, Collections.<QName, Serializable> emptyMap());
@@ -644,5 +655,28 @@ public class SiteHierarchyServiceImpl implements SiteHierarchyService, Initializ
         qnames.addAll(aspects);
 
         policyInvoker.apply(qnames);
+    }
+
+    protected void withAspectInheritedPropertyRemovalGuard(final NodeRef node, final QName baseAspect, final Supplier<?> fn)
+    {
+        // there is a bug when aspects that inherit from another are removed but the base aspect remains
+        // all properties of the base aspect are deleted as well
+        final AspectDefinition aspect = this.dictionaryService.getAspect(baseAspect);
+        final Set<QName> propertiesToPreserve = aspect.getProperties().keySet();
+        final Map<QName, Serializable> properties = this.nodeService.getProperties(node);
+        final Map<QName, Serializable> propertiesBackup = new HashMap<>();
+        propertiesToPreserve.forEach(propertyQName -> {
+            if (properties.containsKey(propertyQName))
+            {
+                propertiesBackup.put(propertyQName, properties.get(propertyQName));
+            }
+        });
+
+        fn.get();
+
+        if (!propertiesBackup.isEmpty())
+        {
+            this.nodeService.addProperties(node, propertiesBackup);
+        }
     }
 }
