@@ -22,5 +22,13 @@
     <bean id="${moduleId}.siteManagementExtensionEvaluator" class="de.acosix.alfresco.utility.share.surf.ShareGlobalEnabledModuleEvaluator">
         <property name="enabled" value="\${${moduleId}.siteManagementExtension.enabled}" />
     </bean>
-    
+
+    <bean class="org.alfresco.i18n.ResourceBundleBootstrapComponent">
+        <property name="resourceBundles">
+            <list>
+                <value>alfresco.messages.${messages.packageId}.labels</value>
+            </list>
+        </property>
+    </bean>
+
 </beans>
