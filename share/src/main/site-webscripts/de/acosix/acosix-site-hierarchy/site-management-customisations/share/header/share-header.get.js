@@ -87,6 +87,8 @@ function processSiteServiceCreateDialog(siteService)
             targetPosition : 'END',
             name : 'alfresco/forms/CollapsibleSection',
             config : {
+                // this is a way to add CSS dependencies provided by acosix-utility module (not supported by default)
+                // it does not really matter where this is included as long as it is on the page
                 cssRequirements : [{
                     cssFile : 'aco6-aikau/layout/css/TwisterEnhancements.css'
                 }],
