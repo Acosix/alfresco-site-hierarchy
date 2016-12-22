@@ -37,6 +37,19 @@ function getSiteHierarchyFormWidgets()
             }
         }
     }, {
+        name : 'alfresco/forms/controls/SitePicker',
+        config : {
+            fieldId : 'ACO6SH_PARENT_SITE',
+            name : 'aco6sh_parentSite',
+            label : 'acosix.siteHierarchy.siteDialog.extensions.parentSite.label',
+            // this is a way to add CSS dependencies provided by acosix-utility module (not supported by default)
+            // it does not really matter where this is included as long as it is on the page
+            cssRequirements : [{
+                cssFile : 'aco6-aikau/forms/css/PickerEnhancements.css'
+            }],
+            additionalCssClasses : 'betterInlinePicker'
+        }
+    }, {
         name : 'alfresco/forms/controls/Select',
         config : {
             fieldId: 'ACO6SH_AUTO_MEMBERSHIP_MODE',

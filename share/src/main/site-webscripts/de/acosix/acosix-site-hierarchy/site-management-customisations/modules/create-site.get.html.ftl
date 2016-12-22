@@ -42,8 +42,8 @@
                 <div id="${parentSiteControlId}" class="object-finder">
                     <div id="${parentSiteControlId}-currentValueDisplay" class="current-values"></div>
                     <input type="hidden" id="${parentSiteFieldId}" name="-" value="" />
-                    <input type="hidden" id="${parentSiteControlId}-added" name="aco6sh_parentSite" />
-                    <input type="hidden" id="${parentSiteControlId}-removed" name="-" />
+                    <input type="hidden" id="${parentSiteControlId}-added" name="aco6sh_parentSite_added" />
+                    <input type="hidden" id="${parentSiteControlId}-removed" name="aco6sh_parentSite_removed" />
                     <div id="${parentSiteControlId}-itemGroupActions" class="show-picker"></div>
 
                     <@renderPickerHTML parentSiteControlId />

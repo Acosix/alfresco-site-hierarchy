@@ -16,17 +16,31 @@
 
 function handleSiteHierarchyData(childSite)
 {
-    var siteNode, propertiesChanged, showInHierarchyMode, autoMembershipMode, parentSiteNodeRefStr, parentSiteNode;
+    var siteNode, propertiesChanged, showInHierarchyMode, autoMembershipMode, parentSite, oldParentSite, parentSiteNode;
     
-    if (json && json.has('aco6sh_parentSite_removed'))
+    if (json)
     {
-        parentSiteNodeRefStr = json.get('aco6sh_parentSite_removed');
-        if (String(parentSiteNodeRefStr) !== '')
+        if (json.has('aco6sh_parentSite_removed'))
         {
-            parentSiteNode = search.findNode(parentSiteNodeRefStr);
-            if (parentSiteNode)
+            // nodeRef (legacy YUI object-finder)
+            parentSite = json.get('aco6sh_parentSite_removed');
+            if (String(parentSite) !== '')
             {
-                siteHierarchies.removeChildSite(parentSiteNode.name, childSite.shortName);
+                parentSiteNode = search.findNode(parentSite);
+                if (parentSiteNode)
+                {
+                    siteHierarchies.removeChildSite(parentSiteNode.name, childSite.shortName);
+                }
+            }
+        }
+        else if (json.has('aco6sh_parentSite'))
+        {
+            // site shortName (e.g. Aikau SitePicker)
+            parentSite = json.get('aco6sh_parentSite');
+            oldParentSite = siteHierarchies.getParentSite(childSite.shortName);
+            if (String(parentSite) !== '' && oldParentSite !== null && String(oldParentSite.shortName) !== String(parentSite))
+            {
+                siteHierarchies.removeChildSite(parentSite.shortName, childSite.shortName);
             }
         }
     }
@@ -36,7 +50,7 @@ function handleSiteHierarchyData(childSite)
         showInHierarchyMode = json.get('aco6sh_showInHierarchyMode');
         if (String(showInHierarchyMode) !== '')
         {
-            siteNode = model.site.node;
+            siteNode = childSite.node;
             siteNode.properties['aco6sh:showInHierarchyMode'] = showInHierarchyMode;
             propertiesChanged = true;
         }
@@ -47,7 +61,7 @@ function handleSiteHierarchyData(childSite)
         autoMembershipMode = json.get('aco6sh_autoMembershipMode');
         if (String(autoMembershipMode) !== '')
         {
-            siteNode = siteNode || model.site.node;
+            siteNode = siteNode || childSite.node;
             if (String(autoMembershipMode) !== 'systemDefault' || siteNode.properties['aco6sh:autoMembershipMode'] !== null)
             {
                 siteNode.properties['aco6sh:autoMembershipMode'] = autoMembershipMode;
@@ -61,15 +75,29 @@ function handleSiteHierarchyData(childSite)
         siteNode.save();
     }
     
-    if (json && json.has('aco6sh_parentSite_added'))
+    if (json)
     {
-        parentSiteNodeRefStr = json.get('aco6sh_parentSite_added');
-        if (String(parentSiteNodeRefStr) !== '')
+        if (json.has('aco6sh_parentSite_added'))
         {
-            parentSiteNode = search.findNode(parentSiteNodeRefStr);
-            if (parentSiteNode)
+            // nodeRef (legacy YUI object-finder)
+            parentSite = json.get('aco6sh_parentSite_added');
+            if (String(parentSite) !== '')
             {
-                siteHierarchies.addChildSite(parentSiteNode.name, childSite.shortName);
+                parentSiteNode = search.findNode(parentSite);
+                if (parentSiteNode)
+                {
+                    siteHierarchies.addChildSite(parentSiteNode.name, newSite.shortName);
+                }
+            }
+        }
+        else if (json.has('aco6sh_parentSite'))
+        {
+            // site shortName (e.g. Aikau SitePicker)
+            parentSite = json.get('aco6sh_parentSite');
+            oldParentSite = siteHierarchies.getParentSite(childSite.shortName);
+            if (String(parentSite) !== '' && oldParentSite === null)
+            {
+                siteHierarchies.addChildSite(parentSite, newSite.shortName);
             }
         }
     }
