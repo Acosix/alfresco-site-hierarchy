@@ -42,7 +42,7 @@ function handleSiteHierarchyData(newSite)
             }
         }
     }
-    
+
     if (propertiesChanged === true && siteNode)
     {
         siteNode.save();
@@ -67,6 +67,18 @@ function handleSiteHierarchyData(newSite)
         {
             // site shortName (e.g. Aikau SitePicker)
             parentSite = json.get('aco6sh_parentSite');
+            // might be a JSONArray since SitePicker (at least until 1.0.101) submitted single values as arrays
+            if (parentSite.isNull !== undefined)
+            {
+                if (parentSite.length() === 1)
+                {
+                    parentSite = parentSite.get(0);
+                }
+                else
+                {
+                    parentSite = '';
+                }
+            }
             if (String(parentSite) !== '')
             {
                 siteHierarchies.addChildSite(parentSite, newSite.shortName);

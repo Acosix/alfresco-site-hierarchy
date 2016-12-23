@@ -17,7 +17,7 @@
 function handleSiteHierarchyData(childSite)
 {
     var siteNode, propertiesChanged, showInHierarchyMode, autoMembershipMode, parentSite, oldParentSite, parentSiteNode;
-    
+
     if (json)
     {
         if (json.has('aco6sh_parentSite_removed'))
@@ -37,6 +37,18 @@ function handleSiteHierarchyData(childSite)
         {
             // site shortName (e.g. Aikau SitePicker)
             parentSite = json.get('aco6sh_parentSite');
+            // might be a JSONArray since SitePicker (at least until 1.0.101) submitted single values as arrays
+            if (parentSite.isNull !== undefined)
+            {
+                if (parentSite.length() === 1)
+                {
+                    parentSite = parentSite.get(0);
+                }
+                else
+                {
+                    parentSite = '';
+                }
+            }
             oldParentSite = siteHierarchies.getParentSite(childSite.shortName);
             if (String(parentSite) !== '' && oldParentSite !== null && String(oldParentSite.shortName) !== String(parentSite))
             {
@@ -44,7 +56,7 @@ function handleSiteHierarchyData(childSite)
             }
         }
     }
-    
+
     if (json && json.has('aco6sh_showInHierarchyMode'))
     {
         showInHierarchyMode = json.get('aco6sh_showInHierarchyMode');
@@ -55,7 +67,7 @@ function handleSiteHierarchyData(childSite)
             propertiesChanged = true;
         }
     }
-    
+
     if (json && json.has('aco6sh_autoMembershipMode'))
     {
         autoMembershipMode = json.get('aco6sh_autoMembershipMode');
@@ -74,7 +86,7 @@ function handleSiteHierarchyData(childSite)
     {
         siteNode.save();
     }
-    
+
     if (json)
     {
         if (json.has('aco6sh_parentSite_added'))
@@ -86,7 +98,7 @@ function handleSiteHierarchyData(childSite)
                 parentSiteNode = search.findNode(parentSite);
                 if (parentSiteNode)
                 {
-                    siteHierarchies.addChildSite(parentSiteNode.name, newSite.shortName);
+                    siteHierarchies.addChildSite(parentSiteNode.name, childSite.shortName);
                 }
             }
         }
@@ -94,10 +106,22 @@ function handleSiteHierarchyData(childSite)
         {
             // site shortName (e.g. Aikau SitePicker)
             parentSite = json.get('aco6sh_parentSite');
+            // might be a JSONArray since SitePicker (at least until 1.0.101) submitted single values as arrays
+            if (parentSite.isNull !== undefined)
+            {
+                if (parentSite.length() === 1)
+                {
+                    parentSite = parentSite.get(0);
+                }
+                else
+                {
+                    parentSite = '';
+                }
+            }
             oldParentSite = siteHierarchies.getParentSite(childSite.shortName);
             if (String(parentSite) !== '' && oldParentSite === null)
             {
-                siteHierarchies.addChildSite(parentSite, newSite.shortName);
+                siteHierarchies.addChildSite(parentSite, childSite.shortName);
             }
         }
     }
