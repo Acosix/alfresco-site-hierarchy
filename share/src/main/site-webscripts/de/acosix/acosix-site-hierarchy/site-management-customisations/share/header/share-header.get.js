@@ -39,6 +39,8 @@ function getSiteHierarchyFormWidgets()
     }, {
         name : 'alfresco/forms/controls/SitePicker',
         config : {
+            // needed to force single item as simple string value
+            valueDelimiter : ',',
             fieldId : 'ACO6SH_PARENT_SITE',
             name : 'aco6sh_parentSite',
             label : 'acosix.siteHierarchy.siteDialog.extensions.parentSite.label',

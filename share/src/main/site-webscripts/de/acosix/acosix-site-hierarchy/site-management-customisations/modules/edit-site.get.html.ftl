@@ -12,7 +12,7 @@
             <div class="yui-u">
                 <select id="${el}-autoMembershipMode" name="aco6sh_showInHierarchyMode" tabindex="0">
                     <#list ["ifParentOrChild", "never", "always"] as mode>
-                        <option value="${mode}"<#if mode == showInHierarchyMode> selected="selected"</#if>>${msg("acosix.siteHierarchy.siteDialog.extensions.showInHierarchyMode." + mode + ".label")?html}</option>
+                        <option value="${mode}"<#if profile.aco6sh_showInHierarchyMode?? && mode == profile.aco6sh_showInHierarchyMode> selected="selected"</#if>>${msg("acosix.siteHierarchy.siteDialog.extensions.showInHierarchyMode." + mode + ".label")?html}</option>
                     </#list>
                 </select>
                 <div>
@@ -25,7 +25,7 @@
             <div class="yui-u">
                 <div id="${parentSiteControlId}" class="object-finder">
                     <div id="${parentSiteControlId}-currentValueDisplay" class="current-values"></div>
-                    <input type="hidden" id="${parentSiteFieldId}" name="-" value="" />
+                    <input type="hidden" id="${parentSiteFieldId}" name="-" value="<#if profile.aco6sh_parentSite??>${profile.aco6sh_parentSite.nodeRef}</#if>" />
                     <input type="hidden" id="${parentSiteControlId}-added" name="aco6sh_parentSite_added" />
                     <input type="hidden" id="${parentSiteControlId}-removed" name="aco6sh_parentSite_removed" />
                     <div id="${parentSiteControlId}-itemGroupActions" class="show-picker"></div>
@@ -39,7 +39,7 @@
             <div class="yui-u">
                 <select id="${el}-autoMembershipMode" name="aco6sh_autoMembershipMode" tabindex="0">
                     <#list ["systemDefault", "none", "parentMembersAsChildConsumers", "childMembersAsParentConsumers"] as mode>
-                        <option value="${mode}"<#if mode == autoMembershipMode> selected="selected"</#if>>${msg("acosix.siteHierarchy.siteDialog.extensions.autoMembershipMode." + mode + ".label")?html}</option>
+                        <option value="${mode}"<#if profile.aco6sh_autoMembershipMode?? && mode == profile.aco6sh_autoMembershipMode> selected="selected"</#if>>${msg("acosix.siteHierarchy.siteDialog.extensions.autoMembershipMode." + mode + ".label")?html}</option>
                     </#list>
                 </select>
                 <div>
@@ -83,7 +83,7 @@
 }());
         //]]></script>
         <script type="text/javascript">//<![CDATA[
-            Alfresco.module.getEditSiteInstance().showConfig.parentSiteNodeRef = "${parentSiteNodeRef!""}";
+            Alfresco.module.getEditSiteInstance().showConfig.parentSiteNodeRef = "<#if profile.aco6sh_parentSite??>${profile.aco6sh_parentSite.nodeRef}</#if>";
         //]]></script>
     </div>
 </@markup>
