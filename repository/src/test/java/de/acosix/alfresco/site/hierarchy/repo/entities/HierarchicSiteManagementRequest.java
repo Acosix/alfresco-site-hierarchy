@@ -15,57 +15,17 @@
  */
 package de.acosix.alfresco.site.hierarchy.repo.entities;
 
-import de.acosix.alfresco.utility.repo.entities.Site;
-
 /**
  * @author Axel Faust, <a href="http://acosix.de">Acosix GmbH</a>
  */
-public class HierarchicSiteManagementRequest extends Site
+public class HierarchicSiteManagementRequest extends BaseHierarchicSiteManagementEntity
 {
-
-    private String aco6sh_showInHierarchyMode;
-
-    private String aco6sh_autoMembershipMode;
 
     private String aco6sh_parentSite;
 
     private String aco6sh_parentSite_added;
 
     private String aco6sh_parentSite_removed;
-
-    /**
-     * @return the aco6sh_showInHierarchyMode
-     */
-    public String getAco6sh_showInHierarchyMode()
-    {
-        return this.aco6sh_showInHierarchyMode;
-    }
-
-    /**
-     * @param aco6sh_showInHierarchyMode
-     *            the aco6sh_showInHierarchyMode to set
-     */
-    public void setAco6sh_showInHierarchyMode(final String aco6sh_showInHierarchyMode)
-    {
-        this.aco6sh_showInHierarchyMode = aco6sh_showInHierarchyMode;
-    }
-
-    /**
-     * @return the aco6sh_autoMembershipMode
-     */
-    public String getAco6sh_autoMembershipMode()
-    {
-        return this.aco6sh_autoMembershipMode;
-    }
-
-    /**
-     * @param aco6sh_autoMembershipMode
-     *            the aco6sh_autoMembershipMode to set
-     */
-    public void setAco6sh_autoMembershipMode(final String aco6sh_autoMembershipMode)
-    {
-        this.aco6sh_autoMembershipMode = aco6sh_autoMembershipMode;
-    }
 
     /**
      * @return the aco6sh_parentSite

@@ -44,6 +44,7 @@ import org.springframework.extensions.surf.util.URLEncoder;
 
 import de.acosix.alfresco.site.hierarchy.repo.entities.HierarchicSite;
 import de.acosix.alfresco.site.hierarchy.repo.entities.HierarchicSiteManagementRequest;
+import de.acosix.alfresco.site.hierarchy.repo.entities.HierarchicSiteManagementResponse;
 import de.acosix.alfresco.site.hierarchy.repo.entities.TopLevelSites;
 import de.acosix.alfresco.site.hierarchy.repo.model.SiteHierarchyModel;
 import de.acosix.alfresco.utility.repo.entities.LoginRequest;
@@ -102,7 +103,7 @@ public class ManagementViaWebScriptsTest
         final String ticket = rs.getData().getTicket();
         Assert.assertNotNull("Ticket should have been obtained", ticket);
 
-        final Site siteToCreate = new Site();
+        final HierarchicSiteManagementRequest siteToCreate = new HierarchicSiteManagementRequest();
         siteToCreate.setShortName("defaultSiteWithoutHierarchy");
         siteToCreate.setSitePreset("site-dashboard");
         siteToCreate.setTitle("Default Site");
@@ -110,18 +111,8 @@ public class ManagementViaWebScriptsTest
         siteToCreate.setIsPublic(Boolean.TRUE);
 
         this.createAndCheckSite(webTarget, ticket, siteToCreate);
-
-        final HierarchicSite hierarchicSite = webTarget
-                .path("/acosix/api/sites/" + URLEncoder.encode(siteToCreate.getShortName()) + "/hierarchy").queryParam("alf_ticket", ticket)
-                .request(MediaType.APPLICATION_JSON).get(HierarchicSite.class);
-
-        Assert.assertEquals("Site should have setting to never be displayed in hierarchy",
-                SiteHierarchyModel.CONSTRAINT_SHOW_IN_HIERARCHY_MODES_NEVER, hierarchicSite.getShowInHierarchyMode());
-        Assert.assertEquals("Site should have setting to not link members", SiteHierarchyModel.CONSTRAINT_AUTO_MEMBERSHIP_MODES_NONE,
-                hierarchicSite.getAutoMembershipMode());
-        Assert.assertNull("Site should not have a parent site", hierarchicSite.getParent());
-        Assert.assertTrue("Site should not have any children",
-                hierarchicSite.getChildren() == null || hierarchicSite.getChildren().isEmpty());
+        checkHierarchySite(webTarget, ticket, siteToCreate, null, null, SiteHierarchyModel.CONSTRAINT_SHOW_IN_HIERARCHY_MODES_NEVER,
+                SiteHierarchyModel.CONSTRAINT_AUTO_MEMBERSHIP_MODES_NONE);
     }
 
     @Test
@@ -163,14 +154,14 @@ public class ManagementViaWebScriptsTest
         siteToUpdate.setShortName(siteToCreate.getShortName());
         siteToUpdate.setDescription("Standalone site - always shown");
         siteToUpdate.setAco6sh_showInHierarchyMode(SiteHierarchyModel.CONSTRAINT_SHOW_IN_HIERARCHY_MODES_ALWAYS);
-        this.updateAndCheckSite(webTarget, ticket, siteToUpdate);
+        this.updateAndCheckSite(webTarget, ticket, siteToUpdate, null, null, null);
 
         this.checkHierarchySite(webTarget, ticket, siteToUpdate, null, null, null, null);
         this.checkSiteInTopLevelSites(webTarget, ticket, siteToCreate.getShortName(), true);
 
         siteToUpdate.setDescription("Standalone site - conditionally shown");
         siteToUpdate.setAco6sh_showInHierarchyMode(SiteHierarchyModel.CONSTRAINT_SHOW_IN_HIERARCHY_MODES_IF_PARENT_OR_CHILD);
-        this.updateAndCheckSite(webTarget, ticket, siteToUpdate);
+        this.updateAndCheckSite(webTarget, ticket, siteToUpdate, null, null, null);
 
         this.checkHierarchySite(webTarget, ticket, siteToUpdate, null, null, null, null);
         this.checkSiteInTopLevelSites(webTarget, ticket, siteToCreate.getShortName(), false);
@@ -226,7 +217,8 @@ public class ManagementViaWebScriptsTest
         final HierarchicSiteManagementRequest childSiteToUpdate = new HierarchicSiteManagementRequest();
         childSiteToUpdate.setShortName(childSiteToCreate.getShortName());
         childSiteToUpdate.setAco6sh_parentSite_added(parentSite.getNodeRef());
-        this.updateAndCheckSite(webTarget, ticket, childSiteToUpdate);
+        this.updateAndCheckSite(webTarget, ticket, childSiteToUpdate, null, SiteHierarchyModel.CONSTRAINT_SHOW_IN_HIERARCHY_MODES_ALWAYS,
+                SiteHierarchyModel.CONSTRAINT_AUTO_MEMBERSHIP_MODES_SYSTEM_DEFAULT);
 
         this.checkSiteInTopLevelSites(webTarget, ticket, parentSiteToCreate.getShortName(), true);
         this.checkSiteInTopLevelSites(webTarget, ticket, childSiteToCreate.getShortName(), false);
@@ -238,7 +230,8 @@ public class ManagementViaWebScriptsTest
 
         childSiteToUpdate.setAco6sh_parentSite_added(null);
         childSiteToUpdate.setAco6sh_parentSite_removed(parentSite.getNodeRef());
-        this.updateAndCheckSite(webTarget, ticket, childSiteToUpdate);
+        this.updateAndCheckSite(webTarget, ticket, childSiteToUpdate, null, SiteHierarchyModel.CONSTRAINT_SHOW_IN_HIERARCHY_MODES_ALWAYS,
+                null);
 
         this.checkSiteInTopLevelSites(webTarget, ticket, parentSiteToCreate.getShortName(), true);
         this.checkSiteInTopLevelSites(webTarget, ticket, childSiteToCreate.getShortName(), true);
@@ -280,11 +273,11 @@ public class ManagementViaWebScriptsTest
             Assert.assertTrue("Site should have expected site(s) as children", foundChildSites.containsAll(childSites));
         }
 
-        Assert.assertEquals("Show in hierarchy mode does not match",
+        Assert.assertEquals("ShowInHierarchyMode does not match expectation",
                 site.getAco6sh_showInHierarchyMode() != null ? site.getAco6sh_showInHierarchyMode()
                         : (showInHierarchyMode != null ? showInHierarchyMode : SiteHierarchyModel.CONSTRAINT_SHOW_IN_HIERARCHY_MODES_NEVER),
                 hierarchicSite.getShowInHierarchyMode());
-        Assert.assertEquals("Auto-membership mode does not match",
+        Assert.assertEquals("AutoMembershipMode does not match expectation",
                 site.getAco6sh_autoMembershipMode() != null ? site.getAco6sh_autoMembershipMode()
                         : (autoMembershipMode != null ? autoMembershipMode : SiteHierarchyModel.CONSTRAINT_AUTO_MEMBERSHIP_MODES_NONE),
                 hierarchicSite.getAutoMembershipMode());
@@ -314,10 +307,11 @@ public class ManagementViaWebScriptsTest
         Assert.assertEquals("Site top-level status listing does not match expectation", expectation, containsSite.get());
     }
 
-    protected Site createAndCheckSite(final WebTarget webTarget, final Object ticket, final Site siteToCreate)
+    protected HierarchicSiteManagementResponse createAndCheckSite(final WebTarget webTarget, final Object ticket,
+            final HierarchicSiteManagementRequest siteToCreate)
     {
-        final Site site = webTarget.path("/api/sites").queryParam("alf_ticket", ticket).request(MediaType.APPLICATION_JSON)
-                .post(Entity.json(siteToCreate), Site.class);
+        final HierarchicSiteManagementResponse site = webTarget.path("/api/sites").queryParam("alf_ticket", ticket)
+                .request(MediaType.APPLICATION_JSON).post(Entity.json(siteToCreate), HierarchicSiteManagementResponse.class);
 
         Assert.assertEquals("Short name does not match", siteToCreate.getShortName(), site.getShortName());
         Assert.assertEquals("Site preset does not match", siteToCreate.getSitePreset(), site.getSitePreset());
@@ -336,13 +330,66 @@ public class ManagementViaWebScriptsTest
                 visibility != null ? visibility : (Boolean.TRUE.equals(siteToCreate.getIsPublic()) ? "PUBLIC" : "PRIVATE"),
                 site.getVisibility());
 
+        String parentSiteShortName = siteToCreate.getAco6sh_parentSite();
+        String parentSiteNodeRef = siteToCreate.getAco6sh_parentSite_added();
+        if (parentSiteShortName != null)
+        {
+            Assert.assertNotNull("Parent site should have been set", site.getAco6sh_parentSite());
+            Assert.assertEquals("Parent site does not match expectation", parentSiteShortName, site.getAco6sh_parentSite().getShortName());
+        }
+        else if (parentSiteNodeRef != null)
+        {
+            Assert.assertNotNull("Parent site should have been set", site.getAco6sh_parentSite());
+            Assert.assertEquals("Parent site does not match expectation", parentSiteNodeRef, site.getAco6sh_parentSite().getNodeRef());
+        }
+        else
+        {
+            Assert.assertNull("Parent site should have been null", site.getAco6sh_parentSite());
+        }
+
+        String autoMembershipMode = siteToCreate.getAco6sh_autoMembershipMode();
+        String showInHierarchyMode = siteToCreate.getAco6sh_showInHierarchyMode();
+        if (autoMembershipMode != null)
+        {
+            Assert.assertEquals("AutoMembershipMode does not match expectation", autoMembershipMode, site.getAco6sh_autoMembershipMode());
+        }
+        else if (parentSiteShortName != null || parentSiteNodeRef != null)
+        {
+            // check model default value
+            Assert.assertEquals("AutoMembershipMode does not match model default value",
+                    SiteHierarchyModel.CONSTRAINT_AUTO_MEMBERSHIP_MODES_SYSTEM_DEFAULT, site.getAco6sh_autoMembershipMode());
+        }
+        else
+        {
+            Assert.assertNull("AutoMembershipMode should have been null", site.getAco6sh_autoMembershipMode());
+        }
+
+        if (showInHierarchyMode != null)
+        {
+            Assert.assertEquals("ShowInHierarchyMode does not match expectation", showInHierarchyMode,
+                    site.getAco6sh_showInHierarchyMode());
+        }
+        else if (parentSiteShortName != null || parentSiteNodeRef != null || autoMembershipMode != null)
+        {
+            // check model default value
+            Assert.assertEquals("ShowInHierarchyMode does not match model default value",
+                    SiteHierarchyModel.CONSTRAINT_SHOW_IN_HIERARCHY_MODES_IF_PARENT_OR_CHILD, site.getAco6sh_showInHierarchyMode());
+        }
+        else
+        {
+            Assert.assertNull("ShowInHierarchyMode should have been null", site.getAco6sh_showInHierarchyMode());
+        }
+
         return site;
     }
 
-    protected Site updateAndCheckSite(final WebTarget webTarget, final Object ticket, final Site siteToUpdate)
+    protected HierarchicSiteManagementResponse updateAndCheckSite(final WebTarget webTarget, final Object ticket,
+            final HierarchicSiteManagementRequest siteToUpdate, final String expectedParentSiteShortName,
+            final String expectedShowInHierarchyMode, final String expectedAutoMembershipMode)
     {
-        final Site site = webTarget.path("/api/sites").path(siteToUpdate.getShortName()).queryParam("alf_ticket", ticket)
-                .request(MediaType.APPLICATION_JSON).put(Entity.json(siteToUpdate), Site.class);
+        final HierarchicSiteManagementResponse site = webTarget.path("/api/sites").path(siteToUpdate.getShortName())
+                .queryParam("alf_ticket", ticket).request(MediaType.APPLICATION_JSON)
+                .put(Entity.json(siteToUpdate), HierarchicSiteManagementResponse.class);
 
         if (siteToUpdate.getTitle() != null)
         {
@@ -363,6 +410,47 @@ public class ManagementViaWebScriptsTest
         {
             Assert.assertEquals("Visibility does not match expectation",
                     visibility != null ? visibility : (Boolean.TRUE.equals(isPublic) ? "PUBLIC" : "PRIVATE"), site.getVisibility());
+        }
+
+        String parentSiteShortName = siteToUpdate.getAco6sh_parentSite();
+        String parentSiteNodeRef = siteToUpdate.getAco6sh_parentSite_added();
+        if (parentSiteShortName != null || (parentSiteNodeRef == null && expectedParentSiteShortName != null))
+        {
+            Assert.assertNotNull("Parent site should have been set", site.getAco6sh_parentSite());
+            Assert.assertEquals("Parent site does not match expectation",
+                    parentSiteShortName != null ? parentSiteShortName : expectedParentSiteShortName,
+                    site.getAco6sh_parentSite().getShortName());
+        }
+        else if (parentSiteNodeRef != null)
+        {
+            Assert.assertNotNull("Parent site should have been set", site.getAco6sh_parentSite());
+            Assert.assertEquals("Parent site does not match expectation", parentSiteNodeRef, site.getAco6sh_parentSite().getNodeRef());
+        }
+        else
+        {
+            Assert.assertNull("Parent site should have been null", site.getAco6sh_parentSite());
+        }
+
+        String autoMembershipMode = siteToUpdate.getAco6sh_autoMembershipMode();
+        if (autoMembershipMode != null || expectedAutoMembershipMode != null)
+        {
+            Assert.assertEquals("AutoMembershipMode does not match expectation",
+                    autoMembershipMode != null ? autoMembershipMode : expectedAutoMembershipMode, site.getAco6sh_autoMembershipMode());
+        }
+        else
+        {
+            Assert.assertNull("AutoMembershipMode should have been null", site.getAco6sh_autoMembershipMode());
+        }
+
+        String showInHierarchyMode = siteToUpdate.getAco6sh_showInHierarchyMode();
+        if (showInHierarchyMode != null || expectedShowInHierarchyMode != null)
+        {
+            Assert.assertEquals("ShowInHierarchyMode does not match expectation",
+                    showInHierarchyMode != null ? showInHierarchyMode : expectedShowInHierarchyMode, site.getAco6sh_showInHierarchyMode());
+        }
+        else
+        {
+            Assert.assertNull("ShowInHierarchyMode should have been null", site.getAco6sh_showInHierarchyMode());
         }
 
         return site;

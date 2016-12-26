@@ -125,6 +125,8 @@ function handleSiteHierarchyData(childSite)
             }
         }
     }
+    
+    model.parentSite = siteHierarchies.getParentSite(childSite);
 }
 
 if (model.site)
