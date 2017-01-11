@@ -23,9 +23,18 @@ function main()
 
     topLevelSites.forEach(function(site)
     {
-        siteModels.push({
-            self : site
-        });
+        var immediateChildSites, siteData = {
+            self : site,
+            hasChildSites : false
+        };
+
+        if (site.node.hasAspect('aco6sh:parentSite'))
+        {
+            immediateChildSites = siteHierarchies.listChildSites(site);
+            siteData.hasChildSites = immediateChildSites !== null && immediateChildSites.length > 0;
+        }
+
+        siteModels.push(siteData);
     });
 
     model.sites = siteModels;

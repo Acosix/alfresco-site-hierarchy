@@ -35,6 +35,7 @@ function main()
         {
             model.site = {
                 self : site,
+                hasChildSites : true,
                 children : []
             };
 
@@ -42,7 +43,8 @@ function main()
             if (parentSite !== null)
             {
                 model.site.parent = {
-                    self : parentSite
+                    self : parentSite,
+                    hasChildSites : true
                 };
             }
             childSites = siteHierarchies.listChildSites(site);
@@ -51,9 +53,18 @@ function main()
                 model.site.children = [];
                 childSites.forEach(function(childSite)
                 {
-                    model.site.children.push({
-                        self : childSite
-                    });
+                    var immediateChildSites, siteData = {
+                        self : childSite,
+                        hasChildSites : false
+                    };
+                    
+                    if (childSite.node.hasAspect('aco6sh:parentSite'))
+                    {
+                        immediateChildSites = siteHierarchies.listChildSites(site);
+                        siteData.hasChildSites = immediateChildSites !== null && immediateChildSites.length > 0;
+                    }
+                    
+                    model.site.children.push(siteData);
                 });
             }
         }

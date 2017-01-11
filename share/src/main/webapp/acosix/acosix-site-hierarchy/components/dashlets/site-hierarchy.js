@@ -103,6 +103,7 @@ if (typeof Acosix === 'undefined' || !Acosix)
                                         shortName : site.shortName,
                                         hierarchyUri : site.hierarchyUri,
                                         labelStyle : 'site ygtvlabel',
+                                        isLeaf : site.hasChildSites !== true && site.hasChildSites !== 'true',
                                         expanded : false
                                     }, root);
                                 }
@@ -184,6 +185,7 @@ if (typeof Acosix === 'undefined' || !Acosix)
                                 shortName : site.shortName,
                                 hierarchyUri : site.hierarchyUri,
                                 labelStyle : 'site ygtvlabel',
+                                isLeaf : site.hasChildSites !== true && site.hasChildSites !== 'true',
                                 expanded : false
                             }, node);
                         }

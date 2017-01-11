@@ -30,7 +30,8 @@
     "isPublic": "${site.self.isPublic?string("true", "false")}",
     "visibility": "${site.self.visibility}",
     "autoMembershipMode": "${site.self.node.properties["aco6sh:autoMembershipMode"]!"none"}",
-    "showInHierarchyMode": "${site.self.node.properties["aco6sh:showInHierarchyMode"]!"never"}"
+    "showInHierarchyMode": "${site.self.node.properties["aco6sh:showInHierarchyMode"]!"never"}",
+    "hasChildSites" : "${(site.hasChildSites!false)?string("true", "false")}"
     <#if site.parent??>,
     "parent" : <@renderSite site.parent />
     </#if>
