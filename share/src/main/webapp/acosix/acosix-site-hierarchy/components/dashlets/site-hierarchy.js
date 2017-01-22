@@ -23,6 +23,8 @@ if (typeof Acosix === 'undefined' || !Acosix)
 
 (function()
 {
+    var Event = YAHOO.util.Event;
+
     Acosix.dashlet = Acosix.dashlet || {};
 
     Acosix.dashlet.SiteHierarchy = function Acosix_SiteHierarchy__constructor(htmlId)
@@ -36,6 +38,115 @@ if (typeof Acosix === 'undefined' || !Acosix)
         onReady : function Acosix_SiteHierarchy__onReady()
         {
             this._buildTree();
+        },
+
+        onConfigClick : function Acosix_SiteHierarchy_onConfigClick(e)
+        {
+            var configDialog;
+
+            Event.stopEvent(e);
+
+            configDialog = new Alfresco.module.SimpleDialog(this.id + '-configDialog');
+            configDialog.setOptions({
+                destroyOnHide : true,
+                doBeforeDialogShow : {
+                    fn : function Acosix_SiteHierarchy_ConfigDialog_doBeforeDialogShow(form, dialog)
+                    {
+                        dialog.widgets.parentSite = new Alfresco.ObjectFinder(dialog.id + '-rootSite-cntrl', dialog.id + '-rootSite');
+                        dialog.widgets.parentSite.setOptions({
+                            field : 'rootSite',
+                            compactMode : false,
+                            mandatory : false,
+                            currentValue : this.options.siteNodeRef || '',
+                            selectActionLabel : Alfresco.util.message('button.select'),
+                            itemFamily : 'node',
+                            itemType : 'st:site',
+                            parentNodeRef : 'alfresco://sites/home',
+                            multipleSelectMode : false,
+                            displayMode : 'items'
+                        });
+
+                        // need to call this explicitly as both default load events (page load and dialog template load) have already been
+                        // passed and object-finder dependencies may still be in the queue if they weren't already available
+                        Alfresco.util.YUILoaderHelper.loadComponents(false);
+                    },
+                    scope : this
+                },
+                doBeforeAjaxRequest : {
+                    fn : function Acosix_SiteHierarchy_ConfigDialog_doBeforeAjaxRequest(config)
+                    {
+                        var dataObj, selectedNodeRef;
+
+                        dataObj = config.dataObj;
+
+                        if (dataObj.rootSite_removed !== '')
+                        {
+                            Alfresco.util.Ajax.jsonPost({
+                                url : Alfresco.constants.URL_SERVICECONTEXT + 'modules/dashlet/config/' + this.options.componentId,
+                                dataObj : {
+                                    rootSite : ''
+                                },
+                                successCallback : {
+                                    fn : function Acosix_SiteHierarchy_ConfigDialog_onConfigCleared()
+                                    {
+                                        window.location.reload();
+                                    },
+                                    scope : this
+                                }
+                            });
+                        }
+                        else if (dataObj.rootSite_added !== '')
+                        {
+                            Alfresco.util.Ajax.jsonGet({
+                                url : Alfresco.constants.PROXY_URI + 'slingshot/doclib2/node/'
+                                        + dataObj.rootSite_added.replace(/:\/\//, '/'),
+                                successCallback : {
+                                    fn : function Acosix_SiteHierarchy_ConfigDialog_onSiteLoadedForUpdate(response)
+                                    {
+                                        var shortName = response.json.item.node.properties['cm:name'];
+
+                                        Alfresco.util.Ajax.jsonPost({
+                                            url : Alfresco.constants.URL_SERVICECONTEXT + 'modules/dashlet/config/'
+                                                    + this.options.componentId,
+                                            dataObj : {
+                                                rootSite : shortName
+                                            },
+                                            successCallback : {
+                                                fn : function Acosix_SiteHierarchy_ConfigDialog_onConfigUpdated()
+                                                {
+                                                    window.location.reload();
+                                                },
+                                                scope : this
+                                            }
+                                        });
+                                    },
+                                    scope : this
+                                }
+                            });
+                        }
+
+                        return false;
+                    },
+                    scope : this
+                }
+            });
+
+            if (this.options.siteNodeRef)
+            {
+                configDialog.setOptions({
+                    templateUrl : Alfresco.constants.URL_SERVICECONTEXT
+                            + 'acosix/modules/dashlet/site-hierarchy/config?currentSiteNodeRef='
+                            + encodeURIComponent(this.options.siteNodeRef)
+                });
+            }
+            else
+            {
+                configDialog.setOptions({
+                    templateUrl : Alfresco.constants.URL_SERVICECONTEXT + 'acosix/modules/dashlet/site-hierarchy/config'
+                });
+            }
+
+            configDialog.show();
         },
 
         onNodeClicked : function Acosix_SiteHierarchy__onNodeClicked(args)

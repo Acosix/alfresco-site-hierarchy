@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<webscript>
+    <shortname>Site Hierarchy Configuration</shortname>
+    <description>Configuration dialog for the Site Hierarchy dashlet</description>
+    <url>/acosix/modules/dashlet/site-hierarchy/config</url>
+</webscript>

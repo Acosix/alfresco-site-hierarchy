@@ -18,10 +18,9 @@ function main()
 {
     var siteHierarchy, dashletResizer, response, siteProfile;
 
-    // TODO Configurable default root site
-    if (page.url.templateArgs.site !== null)
+    if (page.url.templateArgs.site || args.rootSite)
     {
-        response = remote.call('/api/sites/' + encodeURIComponent(page.url.templateArgs.site));
+        response = remote.call('/api/sites/' + encodeURIComponent(page.url.templateArgs.site || args.rootSite));
         if (response.status.code === 200)
         {
             siteProfile = JSON.parse(response.text);
@@ -31,9 +30,12 @@ function main()
     siteHierarchy = {
         id : 'SiteHierarchy',
         name : 'Acosix.dashlet.SiteHierarchy',
+        assignTo : 'siteHierarchy',
         options : {
+            componentId : instance.object.id,
             siteId : siteProfile ? siteProfile.shortName : null,
-            siteTitle : siteProfile ? siteProfile.title : null
+            siteTitle : siteProfile ? siteProfile.title : null,
+            siteNodeRef : siteProfile ? siteProfile.nodeRef : null
         }
     };
 
@@ -45,6 +47,25 @@ function main()
     };
 
     model.widgets = [ siteHierarchy, dashletResizer ];
+
+    if (!page.url.templateArgs.site)
+    {
+        model.widgets.push({
+            id : 'DashletTitleBarActions',
+            name : 'Alfresco.widget.DashletTitleBarActions',
+            useMessages : false,
+            options : {
+                actions : [ {
+                    cssClass : 'edit',
+                    eventOnClick : {
+                        _alfValue : 'siteHierarchyDashletConfigEvent' + args.htmlid.replace(/-/g, '_'),
+                        _alfType : 'REFERENCE'
+                    },
+                    tooltip : msg.get('dashlet.edit.tooltip')
+                } ]
+            }
+        });
+    }
 }
 
 main();

@@ -15,15 +15,28 @@
   -->
 
 <@markup id="css" >
+    <#-- config dialog requires form elements (object-finder) so make sure it is loaded -->
+    <#include "/org/alfresco/components/form/form.css.ftl"/>
     <@link rel="stylesheet" type="text/css" href="${url.context}/res/acosix/acosix-site-hierarchy/components/dashlets/site-hierarchy.css" group="dashlets" />
 </@>
 
 <@markup id="js" >
+    <#-- config dialog requires form elements (object-finder) so make sure it is loaded -->
+    <#include "/org/alfresco/components/form/form.js.ftl"/>
+    <@script type="text/javascript" src="${url.context}/res/modules/simple-dialog.js" group="dashlets"/>
     <@script type="text/javascript" src="${url.context}/res/acosix/acosix-site-hierarchy/components/dashlets/site-hierarchy.js" group="dashlets"/>
 </@>
 
 <@markup id="widgets">
-   <@createWidgets group="dashlets"/>
+    <#assign el=args.htmlid?html>
+    <#assign id=el?replace("-", "_")>
+    <@inlineScript group="dashlets">
+        var siteHierarchyDashletConfigEvent${id} = new YAHOO.util.CustomEvent('onConfigClick');
+    </@>
+    <@createWidgets group="dashlets"/>
+    <@inlineScript group="dashlets">
+        siteHierarchyDashletConfigEvent${id}.subscribe(siteHierarchy.onConfigClick, siteHierarchy, true);
+   </@>
 </@>
 
 <@markup id="html">
