@@ -75,7 +75,7 @@ if (typeof Acosix === 'undefined' || !Acosix)
                 doBeforeAjaxRequest : {
                     fn : function Acosix_SiteHierarchy_ConfigDialog_doBeforeAjaxRequest(config)
                     {
-                        var dataObj, selectedNodeRef;
+                        var dataObj;
 
                         dataObj = config.dataObj;
 
