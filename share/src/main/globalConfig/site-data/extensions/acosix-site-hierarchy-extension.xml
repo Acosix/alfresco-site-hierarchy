@@ -38,5 +38,28 @@
                 </customization>
             </customizations>
         </module>
+        
+        <module>
+            <id>${moduleId} - 5.2 Site Management Extension</id>
+            <description>${project.name} - Site Management Extension for Alfresco 5.2+</description>
+            <version>${noSnapshotVersion}</version>
+            
+            <evaluator type="${moduleId}.siteManagementExtensionEvaluator" />
+
+            <customizations>
+                <customization>
+                    <targetPackageRoot>org.alfresco</targetPackageRoot>
+                    <sourcePackageRoot>de.acosix.${moduleId}.site-management-customisations-52</sourcePackageRoot>
+                </customization>
+
+                <customization>
+                    <targetPackageRoot>org.alfresco.share.pages</targetPackageRoot>
+                    <sourcePackageRoot>de.acosix.${moduleId}.site-management-customisations-52.share.header</sourcePackageRoot>
+                    <alwaysApply>
+                        <webscript>share-header</webscript>
+                    </alwaysApply>
+                </customization>
+            </customizations>
+        </module>
     </modules>
 </extension>
