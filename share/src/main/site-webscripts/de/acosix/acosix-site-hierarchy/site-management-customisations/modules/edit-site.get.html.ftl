@@ -8,15 +8,15 @@
     
     <div id="${el}-acosix-site-hierarchy" class="acosix-site-hierarchy customSiteFields hidden">
         <div class="yui-gd">
-            <div class="yui-u first"><label for="${el}-showInHierarchyMode">${msg("acosix.siteHierarchy.siteDialog.extensions.autoMembershipMode.label")?html}:</label></div>
+            <div class="yui-u first"><label for="${el}-showInHierarchyMode">${msg("acosix.siteHierarchy.siteDialog.extensions.showInHierarchyMode.label")?html}:</label></div>
             <div class="yui-u">
-                <select id="${el}-autoMembershipMode" name="aco6sh_showInHierarchyMode" tabindex="0">
+                <select id="${el}-showInHierarchyMode" name="aco6sh_showInHierarchyMode" tabindex="0">
                     <#list ["ifParentOrChild", "never", "always"] as mode>
                         <option value="${mode}"<#if profile.aco6sh_showInHierarchyMode?? && mode == profile.aco6sh_showInHierarchyMode> selected="selected"</#if>>${msg("acosix.siteHierarchy.siteDialog.extensions.showInHierarchyMode." + mode + ".label")?html}</option>
                     </#list>
                 </select>
                 <div>
-                    <span class="help">${msg("acosix.siteHierarchy.siteDialog.extensions.autoMembershipMode.help")?html}</span>
+                    <span class="help">${msg("acosix.siteHierarchy.siteDialog.extensions.showInHierarchyMode.help")?html}</span>
                 </div>
             </div>
         </div>
@@ -35,7 +35,7 @@
             </div>
         </div>
         <div class="yui-gd">
-            <div class="yui-u first"><label for="${el}-autoMembershipMode">${msg("acosix.siteHierarchy.siteDialog.extensions.showInHierarchyMode.label")?html}:</label></div>
+            <div class="yui-u first"><label for="${el}-autoMembershipMode">${msg("acosix.siteHierarchy.siteDialog.extensions.autoMembershipMode.label")?html}:</label></div>
             <div class="yui-u">
                 <select id="${el}-autoMembershipMode" name="aco6sh_autoMembershipMode" tabindex="0">
                     <#list ["systemDefault", "none", "parentMembersAsChildConsumers", "childMembersAsParentConsumers"] as mode>
@@ -43,7 +43,7 @@
                     </#list>
                 </select>
                 <div>
-                    <span class="help">${msg("acosix.siteHierarchy.siteDialog.extensions.showInHierarchyMode.help")?html}</span>
+                    <span class="help">${msg("acosix.siteHierarchy.siteDialog.extensions.autoMembershipMode.help")?html}</span>
                 </div>
             </div>
         </div>
