@@ -6,12 +6,12 @@
     <parent>
         <groupId>de.acosix.alfresco.maven</groupId>
         <artifactId>de.acosix.alfresco.maven.module.parent</artifactId>
-        <version>1.0.0.1</version>
+        <version>1.0.0.2</version>
     </parent>
 
     <groupId>de.acosix.alfresco.site.hierarchy</groupId>
     <artifactId>de.acosix.alfresco.site.hierarchy.parent</artifactId>
-    <version>1.0.0.1</version>
+    <version>1.0.0.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Acosix Alfresco Site Hierarchy - Parent</name>
@@ -53,7 +53,7 @@
         <messages.packageId>acosix.site-hierarchy</messages.packageId>
         <moduleId>acosix-site-hierarchy</moduleId>
 
-        <acosix.utility.version>1.0.1.0-SNAPSHOT</acosix.utility.version>
+        <acosix.utility.version>1.0.1.0</acosix.utility.version>
         <alfresco.distribution.version>5.0.d</alfresco.distribution.version>
     </properties>
 
