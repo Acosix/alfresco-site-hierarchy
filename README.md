@@ -88,14 +88,14 @@ In order to use a pre-built SNAPSHOT artifact published to the Open Source Sonat
 <dependency>
     <groupId>de.acosix.alfresco.utility</groupId>
     <artifactId>de.acosix.alfresco.utility.common</artifactId>
-    <version>1.0.1.0-SNAPSHOT</version>
+    <version>1.0.1.0</version>
     <type>jar</type>
 </dependency>
 
 <dependency>
     <groupId>de.acosix.alfresco.utility</groupId>
     <artifactId>de.acosix.alfresco.utility.repo</artifactId>
-    <version>1.0.0.0-SNAPSHOT</version>
+    <version>1.0.1.0</version>
     <type>jar</type>
     <classifier>installable</classifier>
 </dependency>
@@ -103,7 +103,7 @@ In order to use a pre-built SNAPSHOT artifact published to the Open Source Sonat
 <dependency>
     <groupId>de.acosix.alfresco.site.hierarchy</groupId>
     <artifactId>de.acosix.alfresco.site.hierarchy.repo</artifactId>
-    <version>1.0.0.0-SNAPSHOT</version>
+    <version>1.0.0.1</version>
     <type>jar</type>
     <classifier>installable</classifier>
 </dependency>
@@ -114,14 +114,14 @@ In order to use a pre-built SNAPSHOT artifact published to the Open Source Sonat
 <dependency>
     <groupId>de.acosix.alfresco.utility</groupId>
     <artifactId>de.acosix.alfresco.utility.repo</artifactId>
-    <version>1.0.1.0-SNAPSHOT</version>
+    <version>1.0.1.0</version>
     <type>amp</type>
 </dependency>
 
 <dependency>
     <groupId>de.acosix.alfresco.site.hierarchy</groupId>
     <artifactId>de.acosix.alfresco.site.hierarchy.repo</artifactId>
-    <version>1.0.0.0-SNAPSHOT</version>
+    <version>1.0.0.1</version>
     <type>amp</type>
 </dependency>
 
@@ -159,13 +159,13 @@ For Alfresco SDK 3 beta users:
     <moduleDependency>
         <groupId>de.acosix.alfresco.utility</groupId>
         <artifactId>de.acosix.alfresco.utility.repo</artifactId>
-        <version>1.0.1.0-SNAPSHOT</version>
+        <version>1.0.1.0</version>
         <type>amp</type>
     </moduleDependency>
     <moduleDependency>
         <groupId>de.acosix.alfresco.site.hierarchy</groupId>
         <artifactId>de.acosix.alfresco.site.hierarchy.repo</artifactId>
-        <version>1.0.0.0-SNAPSHOT</version>
+        <version>1.0.0.1</version>
         <type>amp</type>
     </moduleDependency>
 </platformModules>
@@ -178,14 +178,14 @@ For Alfresco SDK 3 beta users:
 <dependency>
     <groupId>de.acosix.alfresco.utility</groupId>
     <artifactId>de.acosix.alfresco.utility.common</artifactId>
-    <version>1.0.1.0-SNAPSHOT</version>
+    <version>1.0.1.0</version>
     <type>jar</type>
 </dependency>
 
 <dependency>
     <groupId>de.acosix.alfresco.utility</groupId>
     <artifactId>de.acosix.alfresco.utility.share</artifactId>
-    <version>1.0.0.0-SNAPSHOT</version>
+    <version>1.0.1.0</version>
     <type>jar</type>
     <classifier>installable</classifier>
 </dependency>
@@ -193,7 +193,7 @@ For Alfresco SDK 3 beta users:
 <dependency>
     <groupId>de.acosix.alfresco.site.hierarchy</groupId>
     <artifactId>de.acosix.alfresco.site.hierarchy.share</artifactId>
-    <version>1.0.0.0-SNAPSHOT</version>
+    <version>1.0.0.1</version>
     <type>jar</type>
     <classifier>installable</classifier>
 </dependency>
@@ -204,14 +204,14 @@ For Alfresco SDK 3 beta users:
 <dependency>
     <groupId>de.acosix.alfresco.utility</groupId>
     <artifactId>de.acosix.alfresco.utility.share</artifactId>
-    <version>1.0.1.0-SNAPSHOT</version>
+    <version>1.0.1.0</version>
     <type>amp</type>
 </dependency>
 
 <dependency>
     <groupId>de.acosix.alfresco.site.hierarchy</groupId>
     <artifactId>de.acosix.alfresco.site.hierarchy.share</artifactId>
-    <version>1.0.0.0-SNAPSHOT</version>
+    <version>1.0.0.1</version>
     <type>amp</type>
 </dependency>
 
@@ -249,13 +249,13 @@ For Alfresco SDK 3 beta users:
     <moduleDependency>
         <groupId>de.acosix.alfresco.utility</groupId>
         <artifactId>de.acosix.alfresco.utility.share</artifactId>
-        <version>1.0.1.0-SNAPSHOT</version>
+        <version>1.0.1.0</version>
         <type>amp</type>
     </moduleDependency>
     <moduleDependency>
         <groupId>de.acosix.alfresco.site.hierarchy</groupId>
         <artifactId>de.acosix.alfresco.site.hierarchy.share</artifactId>
-        <version>1.0.0.0-SNAPSHOT</version>
+        <version>1.0.0.1</version>
         <type>amp</type>
     </moduleDependency>
 </shareModules>
@@ -288,3 +288,5 @@ For this addon the following JARs need to be dropped into &lt;tomcat&gt;/webapps
  - de.acosix.alfresco.utility.common-&lt;version&gt;.jar
  - de.acosix.alfresco.utility.share-&lt;version&gt;-installable.jar
  - de.acosix.alfresco.site.hierarchy.share-&lt;version&gt;-installable.jar
+
+If Alfresco has been setup by using the official installer, another, **explicitly recommended** way to install the module manually would be by dropping the JAR(s) into the &lt;alfresco&gt;/modules/platform (Repository-tier) or &lt;alfresco&gt;/modules/share (Share-tier) folders.
