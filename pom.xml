@@ -5,8 +5,8 @@
 
     <parent>
         <groupId>de.acosix.alfresco.maven</groupId>
-        <artifactId>de.acosix.alfresco.maven.module.parent</artifactId>
-        <version>1.0.0.2</version>
+        <artifactId>de.acosix.alfresco.maven.module.parent-5.0.d</artifactId>
+        <version>1.0.0.4-SNAPSHOT</version>
     </parent>
 
     <groupId>de.acosix.alfresco.site.hierarchy</groupId>
@@ -53,8 +53,11 @@
         <messages.packageId>acosix.site-hierarchy</messages.packageId>
         <moduleId>acosix-site-hierarchy</moduleId>
 
+        <!-- Java 7 is out of support -->
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+
         <acosix.utility.version>1.0.1.0</acosix.utility.version>
-        <alfresco.distribution.version>5.0.d</alfresco.distribution.version>
     </properties>
 
     <repositories>
