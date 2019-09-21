@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Acosix GmbH
+ * Copyright 2016 - 2019 Acosix GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import java.util.List;
 import de.acosix.alfresco.utility.repo.entities.Site;
 
 /**
- * @author Axel Faust, <a href="http://acosix.de">Acosix GmbH</a>
+ * @author Axel Faust
  */
 public class HierarchicSite extends Site
 {
@@ -32,6 +32,8 @@ public class HierarchicSite extends Site
     private String autoMembershipMode;
 
     private String showInHierarchyMode;
+
+    private String hasChildSites;
 
     private HierarchicSite parent;
 
@@ -103,6 +105,23 @@ public class HierarchicSite extends Site
     public void setShowInHierarchyMode(final String showInHierarchyMode)
     {
         this.showInHierarchyMode = showInHierarchyMode;
+    }
+
+    /**
+     * @return the hasChildSites
+     */
+    public String getHasChildSites()
+    {
+        return this.hasChildSites;
+    }
+
+    /**
+     * @param hasChildSites
+     *            the hasChildSites to set
+     */
+    public void setHasChildSites(final String hasChildSites)
+    {
+        this.hasChildSites = hasChildSites;
     }
 
     /**

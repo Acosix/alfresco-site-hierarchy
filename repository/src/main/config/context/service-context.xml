@@ -25,10 +25,10 @@
         <property name="target" ref="${moduleId}.siteHierarchyService" />
         <property name="interceptorNames">
             <list>
-                <idref local="${moduleId}.SiteHierarchyService_transaction" />
+                <idref bean="${moduleId}.SiteHierarchyService_transaction" />
                 <idref bean="AuditMethodInterceptor" />
                 <idref bean="exceptionTranslator" />
-                <idref local="${moduleId}.SiteHierarchyService_security" />
+                <idref bean="${moduleId}.SiteHierarchyService_security" />
             </list>
         </property>
     </bean>

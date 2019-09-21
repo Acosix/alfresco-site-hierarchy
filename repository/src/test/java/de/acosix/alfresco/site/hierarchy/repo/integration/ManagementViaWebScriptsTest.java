@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Acosix GmbH
+ * Copyright 2016 - 2019 Acosix GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,93 +15,89 @@
  */
 package de.acosix.alfresco.site.hierarchy.repo.integration;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriBuilder;
 
-import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.container.test.api.RunAsClient;
-import org.jboss.arquillian.extension.rest.client.ArquillianResteasyResource;
-import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
-import org.jboss.resteasy.client.jaxrs.internal.ClientConfiguration;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.jboss.shrinkwrap.resolver.api.maven.Maven;
-import org.jboss.shrinkwrap.resolver.api.maven.PomEquippedResolveStage;
+import org.jboss.resteasy.client.jaxrs.internal.LocalResteasyProviderFactory;
+import org.jboss.resteasy.client.jaxrs.internal.ResteasyClientBuilderImpl;
+import org.jboss.resteasy.core.providerfactory.ResteasyProviderFactoryImpl;
+import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
+import org.jboss.resteasy.plugins.providers.jackson.ResteasyJackson2Provider;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.extensions.surf.util.URLEncoder;
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+
+import de.acosix.alfresco.rest.client.api.AuthenticationV1;
+import de.acosix.alfresco.rest.client.jackson.RestAPIBeanDeserializerModifier;
+import de.acosix.alfresco.rest.client.model.authentication.TicketEntity;
+import de.acosix.alfresco.rest.client.model.authentication.TicketRequest;
+import de.acosix.alfresco.rest.client.resteasy.MultiValuedParamConverterProvider;
 import de.acosix.alfresco.site.hierarchy.repo.entities.HierarchicSite;
 import de.acosix.alfresco.site.hierarchy.repo.entities.HierarchicSiteManagementRequest;
 import de.acosix.alfresco.site.hierarchy.repo.entities.HierarchicSiteManagementResponse;
 import de.acosix.alfresco.site.hierarchy.repo.entities.TopLevelSites;
 import de.acosix.alfresco.site.hierarchy.repo.model.SiteHierarchyModel;
-import de.acosix.alfresco.utility.repo.entities.LoginRequest;
-import de.acosix.alfresco.utility.repo.entities.LoginTicketResponse;
-import de.acosix.alfresco.utility.repo.entities.Site;
-import de.acosix.alfresco.utility.repo.jaxrs.AcosixResteasyJacksonProvider;
 
 /**
- * @author Axel Faust, <a href="http://acosix.de">Acosix GmbH</a>
+ * @author Axel Faust
  */
-@RunWith(Arquillian.class)
 public class ManagementViaWebScriptsTest
 {
 
-    @Deployment
-    public static WebArchive create()
+    private static final String baseUrlServer = "http://localhost:8082/alfresco";
+
+    private static ResteasyClient client;
+
+    @BeforeClass
+    public static void setup()
     {
-        final PomEquippedResolveStage configureResolverViaPlugin = Maven.configureResolverViaPlugin();
-        final File warFile = configureResolverViaPlugin.resolve("org.alfresco:alfresco:war:?").withoutTransitivity().asSingleFile();
-        final File[] libraries = configureResolverViaPlugin
-                .resolve(Arrays.asList("org.alfresco:alfresco-repository:jar:h2scripts:?", "com.h2database:h2:jar:?",
-                        "de.acosix.alfresco.utility:de.acosix.alfresco.utility.common:jar:?",
-                        "de.acosix.alfresco.utility:de.acosix.alfresco.utility.repo:jar:installable:?"))
-                .withoutTransitivity().asFile();
-        final WebArchive archive = ShrinkWrap.createFromZipFile(WebArchive.class, warFile);
-        archive.addAsLibraries(libraries);
+        final SimpleModule module = new SimpleModule();
+        module.setDeserializerModifier(new RestAPIBeanDeserializerModifier());
 
-        archive.addAsLibrary("installable-de.acosix.alfresco.site.hierarchy.repo.jar");
+        final ResteasyJackson2Provider resteasyJacksonProvider = new ResteasyJackson2Provider();
+        final ObjectMapper mapper = new ObjectMapper();
+        mapper.setSerializationInclusion(Include.NON_EMPTY);
+        mapper.registerModule(module);
+        resteasyJacksonProvider.setMapper(mapper);
 
-        archive.addAsResource("configRoot/alfresco-global.properties", "alfresco-global.properties");
-        archive.addAsResource("configRoot/log4j.properties", "log4j.properties");
-        archive.addAsResource("configRoot/alfresco/extension/dev-log4j.properties", "alfresco/extension/dev-log4j.properties");
-        return archive;
+        final LocalResteasyProviderFactory resteasyProviderFactory = new LocalResteasyProviderFactory(new ResteasyProviderFactoryImpl());
+        resteasyProviderFactory.register(resteasyJacksonProvider);
+        // will cause a warning regarding Jackson provider which is already registered
+        RegisterBuiltin.register(resteasyProviderFactory);
+        resteasyProviderFactory.register(new MultiValuedParamConverterProvider());
+
+        client = new ResteasyClientBuilderImpl().providerFactory(resteasyProviderFactory).build();
     }
 
     @Test
-    @RunAsClient
-    public void defaultSiteWithoutHierarchy(@ArquillianResteasyResource(value = "s") final WebTarget webTarget)
+    public void defaultSiteWithoutHierarchy()
     {
-        if (webTarget instanceof ResteasyWebTarget)
-        {
-            final Configuration configuration = webTarget.getConfiguration();
-            if (configuration instanceof ClientConfiguration)
-            {
-                ((ClientConfiguration) configuration).register(AcosixResteasyJacksonProvider.class);
-            }
-        }
+        final ResteasyWebTarget targetServer = client.target(UriBuilder.fromPath(baseUrlServer));
 
-        final LoginRequest rq = new LoginRequest();
-        rq.setUsername("admin");
+        final TicketRequest rq = new TicketRequest();
+        rq.setUserId("admin");
         rq.setPassword("admin");
 
-        final LoginTicketResponse rs = webTarget.path("/api/login").request(MediaType.APPLICATION_JSON).post(Entity.json(rq),
-                LoginTicketResponse.class);
-        Assert.assertNotNull("Login repsonse does not contain data", rs.getData());
-        final String ticket = rs.getData().getTicket();
+        final AuthenticationV1 authenticationAPI = targetServer.proxy(AuthenticationV1.class);
+        final TicketEntity ticket = authenticationAPI.createTicket(rq);
+
         Assert.assertNotNull("Ticket should have been obtained", ticket);
+
+        final WebTarget webTarget = client.target(UriBuilder.fromPath(baseUrlServer + "/s"));
 
         final HierarchicSiteManagementRequest siteToCreate = new HierarchicSiteManagementRequest();
         siteToCreate.setShortName("defaultSiteWithoutHierarchy");
@@ -110,33 +106,27 @@ public class ManagementViaWebScriptsTest
         siteToCreate.setDescription("Default site without hierarchy data");
         siteToCreate.setIsPublic(Boolean.TRUE);
 
-        this.createAndCheckSite(webTarget, ticket, siteToCreate);
-        checkHierarchySite(webTarget, ticket, siteToCreate, null, null, SiteHierarchyModel.CONSTRAINT_SHOW_IN_HIERARCHY_MODES_NEVER,
+        this.createAndCheckSite(webTarget, ticket.getId(), siteToCreate);
+        this.checkHierarchySite(webTarget, ticket.getId(), siteToCreate, null, null,
+                SiteHierarchyModel.CONSTRAINT_SHOW_IN_HIERARCHY_MODES_NEVER,
                 SiteHierarchyModel.CONSTRAINT_AUTO_MEMBERSHIP_MODES_NONE);
     }
 
     @Test
-    @RunAsClient
-    public void standaloneSite(@ArquillianResteasyResource(value = "s") final WebTarget webTarget)
+    public void standaloneSite()
     {
-        if (webTarget instanceof ResteasyWebTarget)
-        {
-            final Configuration configuration = webTarget.getConfiguration();
-            if (configuration instanceof ClientConfiguration)
-            {
-                ((ClientConfiguration) configuration).register(AcosixResteasyJacksonProvider.class);
-            }
-        }
+        final ResteasyWebTarget targetServer = client.target(UriBuilder.fromPath(baseUrlServer));
 
-        final LoginRequest rq = new LoginRequest();
-        rq.setUsername("admin");
+        final TicketRequest rq = new TicketRequest();
+        rq.setUserId("admin");
         rq.setPassword("admin");
 
-        final LoginTicketResponse rs = webTarget.path("/api/login").request(MediaType.APPLICATION_JSON).post(Entity.json(rq),
-                LoginTicketResponse.class);
-        Assert.assertNotNull("Login repsonse does not contain data", rs.getData());
-        final String ticket = rs.getData().getTicket();
+        final AuthenticationV1 authenticationAPI = targetServer.proxy(AuthenticationV1.class);
+        final TicketEntity ticket = authenticationAPI.createTicket(rq);
+
         Assert.assertNotNull("Ticket should have been obtained", ticket);
+
+        final WebTarget webTarget = client.target(UriBuilder.fromPath(baseUrlServer + "/s"));
 
         final HierarchicSiteManagementRequest siteToCreate = new HierarchicSiteManagementRequest();
         siteToCreate.setShortName("standaloneSite");
@@ -146,49 +136,42 @@ public class ManagementViaWebScriptsTest
         siteToCreate.setIsPublic(Boolean.TRUE);
         siteToCreate.setAco6sh_showInHierarchyMode(SiteHierarchyModel.CONSTRAINT_SHOW_IN_HIERARCHY_MODES_NEVER);
 
-        this.createAndCheckSite(webTarget, ticket, siteToCreate);
-        this.checkHierarchySite(webTarget, ticket, siteToCreate, null, null, null, null);
-        this.checkSiteInTopLevelSites(webTarget, ticket, siteToCreate.getShortName(), false);
+        this.createAndCheckSite(webTarget, ticket.getId(), siteToCreate);
+        this.checkHierarchySite(webTarget, ticket.getId(), siteToCreate, null, null, null, null);
+        this.checkSiteInTopLevelSites(webTarget, ticket.getId(), siteToCreate.getShortName(), false);
 
         final HierarchicSiteManagementRequest siteToUpdate = new HierarchicSiteManagementRequest();
         siteToUpdate.setShortName(siteToCreate.getShortName());
         siteToUpdate.setDescription("Standalone site - always shown");
         siteToUpdate.setAco6sh_showInHierarchyMode(SiteHierarchyModel.CONSTRAINT_SHOW_IN_HIERARCHY_MODES_ALWAYS);
-        this.updateAndCheckSite(webTarget, ticket, siteToUpdate, null, null, null);
+        this.updateAndCheckSite(webTarget, ticket.getId(), siteToUpdate, null, null, null);
 
-        this.checkHierarchySite(webTarget, ticket, siteToUpdate, null, null, null, null);
-        this.checkSiteInTopLevelSites(webTarget, ticket, siteToCreate.getShortName(), true);
+        this.checkHierarchySite(webTarget, ticket.getId(), siteToUpdate, null, null, null, null);
+        this.checkSiteInTopLevelSites(webTarget, ticket.getId(), siteToCreate.getShortName(), true);
 
         siteToUpdate.setDescription("Standalone site - conditionally shown");
         siteToUpdate.setAco6sh_showInHierarchyMode(SiteHierarchyModel.CONSTRAINT_SHOW_IN_HIERARCHY_MODES_IF_PARENT_OR_CHILD);
-        this.updateAndCheckSite(webTarget, ticket, siteToUpdate, null, null, null);
+        this.updateAndCheckSite(webTarget, ticket.getId(), siteToUpdate, null, null, null);
 
-        this.checkHierarchySite(webTarget, ticket, siteToUpdate, null, null, null, null);
-        this.checkSiteInTopLevelSites(webTarget, ticket, siteToCreate.getShortName(), false);
+        this.checkHierarchySite(webTarget, ticket.getId(), siteToUpdate, null, null, null, null);
+        this.checkSiteInTopLevelSites(webTarget, ticket.getId(), siteToCreate.getShortName(), false);
     }
 
     @Test
-    @RunAsClient
-    public void relateExistingSitesAsParentAndChild(@ArquillianResteasyResource(value = "s") final WebTarget webTarget)
+    public void relateExistingSitesAsParentAndChild()
     {
-        if (webTarget instanceof ResteasyWebTarget)
-        {
-            final Configuration configuration = webTarget.getConfiguration();
-            if (configuration instanceof ClientConfiguration)
-            {
-                ((ClientConfiguration) configuration).register(AcosixResteasyJacksonProvider.class);
-            }
-        }
+        final ResteasyWebTarget targetServer = client.target(UriBuilder.fromPath(baseUrlServer));
 
-        final LoginRequest rq = new LoginRequest();
-        rq.setUsername("admin");
+        final TicketRequest rq = new TicketRequest();
+        rq.setUserId("admin");
         rq.setPassword("admin");
 
-        final LoginTicketResponse rs = webTarget.path("/api/login").request(MediaType.APPLICATION_JSON).post(Entity.json(rq),
-                LoginTicketResponse.class);
-        Assert.assertNotNull("Login repsonse does not contain data", rs.getData());
-        final String ticket = rs.getData().getTicket();
+        final AuthenticationV1 authenticationAPI = targetServer.proxy(AuthenticationV1.class);
+        final TicketEntity ticket = authenticationAPI.createTicket(rq);
+
         Assert.assertNotNull("Ticket should have been obtained", ticket);
+
+        final WebTarget webTarget = client.target(UriBuilder.fromPath(baseUrlServer + "/s"));
 
         final HierarchicSiteManagementRequest parentSiteToCreate = new HierarchicSiteManagementRequest();
         parentSiteToCreate.setShortName("existingParentSite");
@@ -198,9 +181,9 @@ public class ManagementViaWebScriptsTest
         parentSiteToCreate.setIsPublic(Boolean.TRUE);
         parentSiteToCreate.setAco6sh_showInHierarchyMode(SiteHierarchyModel.CONSTRAINT_SHOW_IN_HIERARCHY_MODES_ALWAYS);
 
-        this.createAndCheckSite(webTarget, ticket, parentSiteToCreate);
-        final HierarchicSite parentSite = this.checkHierarchySite(webTarget, ticket, parentSiteToCreate, null, null, null, null);
-        this.checkSiteInTopLevelSites(webTarget, ticket, parentSiteToCreate.getShortName(), true);
+        this.createAndCheckSite(webTarget, ticket.getId(), parentSiteToCreate);
+        final HierarchicSite parentSite = this.checkHierarchySite(webTarget, ticket.getId(), parentSiteToCreate, null, null, null, null);
+        this.checkSiteInTopLevelSites(webTarget, ticket.getId(), parentSiteToCreate.getShortName(), true);
 
         final HierarchicSiteManagementRequest childSiteToCreate = new HierarchicSiteManagementRequest();
         childSiteToCreate.setShortName("existingChildSite");
@@ -210,34 +193,35 @@ public class ManagementViaWebScriptsTest
         childSiteToCreate.setIsPublic(Boolean.TRUE);
         childSiteToCreate.setAco6sh_showInHierarchyMode(SiteHierarchyModel.CONSTRAINT_SHOW_IN_HIERARCHY_MODES_ALWAYS);
 
-        this.createAndCheckSite(webTarget, ticket, childSiteToCreate);
-        this.checkHierarchySite(webTarget, ticket, childSiteToCreate, null, null, null, null);
-        this.checkSiteInTopLevelSites(webTarget, ticket, childSiteToCreate.getShortName(), true);
+        this.createAndCheckSite(webTarget, ticket.getId(), childSiteToCreate);
+        this.checkHierarchySite(webTarget, ticket.getId(), childSiteToCreate, null, null, null, null);
+        this.checkSiteInTopLevelSites(webTarget, ticket.getId(), childSiteToCreate.getShortName(), true);
 
         final HierarchicSiteManagementRequest childSiteToUpdate = new HierarchicSiteManagementRequest();
         childSiteToUpdate.setShortName(childSiteToCreate.getShortName());
         childSiteToUpdate.setAco6sh_parentSite_added(parentSite.getNodeRef());
-        this.updateAndCheckSite(webTarget, ticket, childSiteToUpdate, null, SiteHierarchyModel.CONSTRAINT_SHOW_IN_HIERARCHY_MODES_ALWAYS,
+        this.updateAndCheckSite(webTarget, ticket.getId(), childSiteToUpdate, null,
+                SiteHierarchyModel.CONSTRAINT_SHOW_IN_HIERARCHY_MODES_ALWAYS,
                 SiteHierarchyModel.CONSTRAINT_AUTO_MEMBERSHIP_MODES_SYSTEM_DEFAULT);
 
-        this.checkSiteInTopLevelSites(webTarget, ticket, parentSiteToCreate.getShortName(), true);
-        this.checkSiteInTopLevelSites(webTarget, ticket, childSiteToCreate.getShortName(), false);
+        this.checkSiteInTopLevelSites(webTarget, ticket.getId(), parentSiteToCreate.getShortName(), true);
+        this.checkSiteInTopLevelSites(webTarget, ticket.getId(), childSiteToCreate.getShortName(), false);
 
-        this.checkHierarchySite(webTarget, ticket, parentSiteToCreate, null, Collections.singletonList(childSiteToCreate.getShortName()),
+        this.checkHierarchySite(webTarget, ticket.getId(), parentSiteToCreate, null, Collections.singletonList(childSiteToCreate.getShortName()),
                 null, null);
-        this.checkHierarchySite(webTarget, ticket, childSiteToCreate, parentSiteToCreate.getShortName(), null, null,
+        this.checkHierarchySite(webTarget, ticket.getId(), childSiteToCreate, parentSiteToCreate.getShortName(), null, null,
                 SiteHierarchyModel.CONSTRAINT_AUTO_MEMBERSHIP_MODES_SYSTEM_DEFAULT);
 
         childSiteToUpdate.setAco6sh_parentSite_added(null);
         childSiteToUpdate.setAco6sh_parentSite_removed(parentSite.getNodeRef());
-        this.updateAndCheckSite(webTarget, ticket, childSiteToUpdate, null, SiteHierarchyModel.CONSTRAINT_SHOW_IN_HIERARCHY_MODES_ALWAYS,
+        this.updateAndCheckSite(webTarget, ticket.getId(), childSiteToUpdate, null, SiteHierarchyModel.CONSTRAINT_SHOW_IN_HIERARCHY_MODES_ALWAYS,
                 null);
 
-        this.checkSiteInTopLevelSites(webTarget, ticket, parentSiteToCreate.getShortName(), true);
-        this.checkSiteInTopLevelSites(webTarget, ticket, childSiteToCreate.getShortName(), true);
+        this.checkSiteInTopLevelSites(webTarget, ticket.getId(), parentSiteToCreate.getShortName(), true);
+        this.checkSiteInTopLevelSites(webTarget, ticket.getId(), childSiteToCreate.getShortName(), true);
 
-        this.checkHierarchySite(webTarget, ticket, parentSiteToCreate, null, null, null, null);
-        this.checkHierarchySite(webTarget, ticket, childSiteToCreate, null, null, null, null);
+        this.checkHierarchySite(webTarget, ticket.getId(), parentSiteToCreate, null, null, null, null);
+        this.checkHierarchySite(webTarget, ticket.getId(), childSiteToCreate, null, null, null, null);
     }
 
     protected HierarchicSite checkHierarchySite(final WebTarget webTarget, final String ticket, final HierarchicSiteManagementRequest site,
@@ -330,8 +314,8 @@ public class ManagementViaWebScriptsTest
                 visibility != null ? visibility : (Boolean.TRUE.equals(siteToCreate.getIsPublic()) ? "PUBLIC" : "PRIVATE"),
                 site.getVisibility());
 
-        String parentSiteShortName = siteToCreate.getAco6sh_parentSite();
-        String parentSiteNodeRef = siteToCreate.getAco6sh_parentSite_added();
+        final String parentSiteShortName = siteToCreate.getAco6sh_parentSite();
+        final String parentSiteNodeRef = siteToCreate.getAco6sh_parentSite_added();
         if (parentSiteShortName != null)
         {
             Assert.assertNotNull("Parent site should have been set", site.getAco6sh_parentSite());
@@ -347,8 +331,8 @@ public class ManagementViaWebScriptsTest
             Assert.assertNull("Parent site should have been null", site.getAco6sh_parentSite());
         }
 
-        String autoMembershipMode = siteToCreate.getAco6sh_autoMembershipMode();
-        String showInHierarchyMode = siteToCreate.getAco6sh_showInHierarchyMode();
+        final String autoMembershipMode = siteToCreate.getAco6sh_autoMembershipMode();
+        final String showInHierarchyMode = siteToCreate.getAco6sh_showInHierarchyMode();
         if (autoMembershipMode != null)
         {
             Assert.assertEquals("AutoMembershipMode does not match expectation", autoMembershipMode, site.getAco6sh_autoMembershipMode());
@@ -412,8 +396,8 @@ public class ManagementViaWebScriptsTest
                     visibility != null ? visibility : (Boolean.TRUE.equals(isPublic) ? "PUBLIC" : "PRIVATE"), site.getVisibility());
         }
 
-        String parentSiteShortName = siteToUpdate.getAco6sh_parentSite();
-        String parentSiteNodeRef = siteToUpdate.getAco6sh_parentSite_added();
+        final String parentSiteShortName = siteToUpdate.getAco6sh_parentSite();
+        final String parentSiteNodeRef = siteToUpdate.getAco6sh_parentSite_added();
         if (parentSiteShortName != null || (parentSiteNodeRef == null && expectedParentSiteShortName != null))
         {
             Assert.assertNotNull("Parent site should have been set", site.getAco6sh_parentSite());
@@ -431,7 +415,7 @@ public class ManagementViaWebScriptsTest
             Assert.assertNull("Parent site should have been null", site.getAco6sh_parentSite());
         }
 
-        String autoMembershipMode = siteToUpdate.getAco6sh_autoMembershipMode();
+        final String autoMembershipMode = siteToUpdate.getAco6sh_autoMembershipMode();
         if (autoMembershipMode != null || expectedAutoMembershipMode != null)
         {
             Assert.assertEquals("AutoMembershipMode does not match expectation",
@@ -442,7 +426,7 @@ public class ManagementViaWebScriptsTest
             Assert.assertNull("AutoMembershipMode should have been null", site.getAco6sh_autoMembershipMode());
         }
 
-        String showInHierarchyMode = siteToUpdate.getAco6sh_showInHierarchyMode();
+        final String showInHierarchyMode = siteToUpdate.getAco6sh_showInHierarchyMode();
         if (showInHierarchyMode != null || expectedShowInHierarchyMode != null)
         {
             Assert.assertEquals("ShowInHierarchyMode does not match expectation",

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Acosix GmbH
+ * Copyright 2016 - 2019 Acosix GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package de.acosix.alfresco.site.hierarchy.repo.entities;
 import de.acosix.alfresco.utility.repo.entities.Site;
 
 /**
- * @author Axel Faust, <a href="http://acosix.de">Acosix GmbH</a>
+ * @author Axel Faust
  */
 public class BaseHierarchicSiteManagementEntity extends Site
 {
@@ -26,6 +26,9 @@ public class BaseHierarchicSiteManagementEntity extends Site
     private String aco6sh_showInHierarchyMode;
 
     private String aco6sh_autoMembershipMode;
+
+    // added by enhancement in Acosix Utility
+    private String nodeRef;
 
     /**
      * @return the aco6sh_showInHierarchyMode
@@ -59,6 +62,23 @@ public class BaseHierarchicSiteManagementEntity extends Site
     public void setAco6sh_autoMembershipMode(final String aco6sh_autoMembershipMode)
     {
         this.aco6sh_autoMembershipMode = aco6sh_autoMembershipMode;
+    }
+
+    /**
+     * @return the nodeRef
+     */
+    public String getNodeRef()
+    {
+        return this.nodeRef;
+    }
+
+    /**
+     * @param nodeRef
+     *            the nodeRef to set
+     */
+    public void setNodeRef(final String nodeRef)
+    {
+        this.nodeRef = nodeRef;
     }
 
 }

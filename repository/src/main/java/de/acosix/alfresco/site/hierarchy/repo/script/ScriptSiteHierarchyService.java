@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Acosix GmbH
+ * Copyright 2016 - 2019 Acosix GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ import de.acosix.alfresco.site.hierarchy.repo.model.SiteHierarchyModel;
 import de.acosix.alfresco.site.hierarchy.repo.service.SiteHierarchyService;
 
 /**
- * @author Axel Faust, <a href="http://acosix.de">Acosix GmbH</a>
+ * @author Axel Faust
  */
 public class ScriptSiteHierarchyService extends BaseScopableProcessorExtension implements InitializingBean
 {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Acosix GmbH
+ * Copyright 2016 - 2019 Acosix GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import de.acosix.alfresco.site.hierarchy.repo.model.SiteHierarchyModel;
 /**
  * Collection of interfaces for policies allowing reacting to events of the {@link SiteHierarchyService}.
  *
- * @author Axel Faust, <a href="http://acosix.de">Acosix GmbH</a>
+ * @author Axel Faust
  */
 public interface SiteHierarchyServicePolicies
 {
@@ -32,7 +32,7 @@ public interface SiteHierarchyServicePolicies
     /**
      * Policy interface to react to the event triggered before a site is added as a child of another.
      *
-     * @author Axel Faust, <a href="http://acosix.de">Acosix GmbH</a>
+     * @author Axel Faust
      */
     interface BeforeAddChildSitePolicy extends ClassPolicy
     {
@@ -55,7 +55,7 @@ public interface SiteHierarchyServicePolicies
     /**
      * Policy interface to react to the event triggered after a site has been added as a child of another.
      *
-     * @author Axel Faust, <a href="http://acosix.de">Acosix GmbH</a>
+     * @author Axel Faust
      */
     interface OnAddChildSitePolicy extends ClassPolicy
     {
@@ -78,7 +78,7 @@ public interface SiteHierarchyServicePolicies
     /**
      * Policy interface to react to the event triggered before a site is removed as a child of another.
      *
-     * @author Axel Faust, <a href="http://acosix.de">Acosix GmbH</a>
+     * @author Axel Faust
      */
     interface BeforeRemoveChildSitePolicy extends ClassPolicy
     {
@@ -101,7 +101,7 @@ public interface SiteHierarchyServicePolicies
     /**
      * Policy interface to react to the event triggered after a site has been removed as a child to another.
      *
-     * @author Axel Faust, <a href="http://acosix.de">Acosix GmbH</a>
+     * @author Axel Faust
      */
     interface OnRemoveChildSitePolicy extends ClassPolicy
     {
