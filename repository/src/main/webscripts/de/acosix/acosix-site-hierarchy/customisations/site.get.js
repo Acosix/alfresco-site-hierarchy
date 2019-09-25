@@ -16,7 +16,7 @@
 
 function enhanceModel(site)
 {
-    model.parentSite = siteHierarchies.getParentSite(site);
+    model.parentSite = site ? siteHierarchies.getParentSite(site) : null;
     // everything else can be extracted from the site itself in FTL
 }
 
