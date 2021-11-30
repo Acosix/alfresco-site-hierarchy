@@ -1,14 +1,14 @@
 /*
- * Copyright 2016 - 2019 Acosix GmbH
+ * Copyright 2016 - 2021 Acosix GmbH
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * distributed under the License is distributed on an 'AS IS' BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
@@ -22,20 +22,20 @@ function main()
 
     if (shortName === null)
     {
-        status.setCode(400, "Site shortName needs to be provided");
+        status.setCode(400, 'Site shortName needs to be provided');
     }
     else
     {
         site = siteService.getSite(shortName);
         if (site === null)
         {
-            status.setCode(404, "Site " + shortName + " does not exist");
+            status.setCode(404, 'Site ' + shortName + ' does not exist');
         }
         else
         {
             model.site = {
                 self : site,
-                hasChildSites : true,
+                hasChildSites : false,
                 children : []
             };
 
@@ -50,7 +50,7 @@ function main()
             childSites = siteHierarchies.listChildSites(site);
             if (childSites.length > 0)
             {
-                model.site.children = [];
+                model.site.hasChildSites = true;
                 childSites.forEach(function(childSite)
                 {
                     var immediateChildSites, siteData = {
@@ -60,7 +60,7 @@ function main()
                     
                     if (childSite.node.hasAspect('aco6sh:parentSite'))
                     {
-                        immediateChildSites = siteHierarchies.listChildSites(site);
+                        immediateChildSites = siteHierarchies.listChildSites(childSite);
                         siteData.hasChildSites = immediateChildSites !== null && immediateChildSites.length > 0;
                     }
                     
