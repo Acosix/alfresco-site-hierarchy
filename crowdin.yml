@@ -1,3 +1,0 @@
-files:
-  - source: messages/*.properties
-    translation: '%original_path%/%file_name%'
