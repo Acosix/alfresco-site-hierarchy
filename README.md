@@ -290,3 +290,13 @@ For this addon the following JARs need to be dropped into &lt;tomcat&gt;/webapps
  - de.acosix.alfresco.site.hierarchy.share-&lt;version&gt;-installable.jar
 
 If Alfresco has been setup by using the official installer, another, **explicitly recommended** way to install the module manually would be by dropping the JAR(s) into the &lt;alfresco&gt;/modules/platform (Repository-tier) or &lt;alfresco&gt;/modules/share (Share-tier) folders.
+
+## Deployment (After installation)
+
+You need to deploy the module "acosix-site-hierarchy - 5.2 Site Management Extension" by going to 
+```xml
+http:// <localhost:8080> OR <alfrescohost:alfrescoport> /share/page/modules/deploy
+eg. http://localhost:8080/share/page/modules/deploy
+```
+### Tip
+As the module may interfere with TinyMCE (problem due to Alfresco and NOT this module), you may want to deploy the module and create/edit sites; and then un-deploy the module. The same can be done without re-starting the Alfresco server.
